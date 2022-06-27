@@ -3,14 +3,14 @@ const DataTypes = require('sequelize');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('administradores', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      username: {
+      email: {
         type: DataTypes.STRING(100),
         allowNull: false,
         unique: true,
@@ -21,17 +21,9 @@ module.exports = {
           is: /^[0-9a-f]{64}$/i,
         },
       },
-      createdAt: {
-        allowNull: true,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: true,
-        type: Sequelize.DATE
-      }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('administradores');
   }
 };

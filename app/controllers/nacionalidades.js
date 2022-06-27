@@ -1,14 +1,14 @@
 const Sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
-const administrador = require("../models").administrador;
+const nacionalidad = require("../models").Nacionalidad;
 
 
-const getItems = (req, res) => {
+const getItems = async (req, res) => {
   try{
-
-    const admin = administrador.findOne({where: {id:req.uid}})
-
-    return res.json({admin})
+    const nations = await nacionalidad.findAll(
+      { include : [{all:true}] }
+    )
+    return res.json({nations})
 
 }catch(error){
  
@@ -19,11 +19,9 @@ const getItems = (req, res) => {
 
 
 const getItem = async (req, res) => {
-
 };
 
 const createItems = async (req, res) => {
-
 };
 const updateItems = (req, res) => {};
 const deleteItems = (req, res) => {};

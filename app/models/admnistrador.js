@@ -15,7 +15,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
         unique: true,
-        length: 50,
       },
       password: {
         type: DataTypes.TEXT,
@@ -26,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      timestamps: true,
+      timestamps: false,
       freezeTableName: true,
       tableName: "administradores",
       hooks: {
@@ -43,18 +42,11 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     },
-    instanceMethods: {
-        validPassword: (password) => {
-            return bcrypt.compareSync(password, this.password);
-        }
     
-    }
     }
   );
 
-  Administrador.validPassword = (password) => {
-    return bcrypt.compareSync(password, this.password);
-}
+  
   Administrador.associate = function (models) {
     // definir relaciones
   };

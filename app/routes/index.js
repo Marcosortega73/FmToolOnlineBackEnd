@@ -12,6 +12,7 @@ const removeExtension = (fileName) =>{
 fs.readdirSync(pathRouter).filter((file)=>{
 
     const newFile = removeExtension(file)
+
     const skipe = ['index'].includes(newFile)
 
     if(!skipe){
@@ -22,10 +23,10 @@ fs.readdirSync(pathRouter).filter((file)=>{
     }
     
 
-router.get('*', (req,res)=>{
-    res.status(404),
-    res.send({error:'No Existe La Ruta'})
-})
+//             router.get('*', (req,res)=>{
+//             res.status(404),
+//             res.send({error:'No Existe La Ruta'})
+// })
 })
 
 

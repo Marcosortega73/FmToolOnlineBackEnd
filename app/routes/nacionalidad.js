@@ -1,9 +1,9 @@
 const express = require('express');
-const verifyToken = require('../../middlewares/verifyToken');
+const verifyToken = require('../middlewares/verifyToken');
 const router = express.Router();
-const {getItems,getItem,createItems,updateItems,deleteItems} = require('../controllers/adminSeccionUsuarios')
+const {getItems,getItem,createItems,updateItems,deleteItems} = require('../controllers/nacionalidades')
 
-router.get('/', verifyToken , getItems )
+router.get('/obtenerNacionalidades', getItems )
 
 router.get('/:id', getItem)
 
