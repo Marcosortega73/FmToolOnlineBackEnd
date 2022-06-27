@@ -12,19 +12,24 @@ var logger = require('morgan')
 //Importar Rutas
 const routes = require('./app/routes')
 
+var  cookieParser  =  require ( 'cookie-parser' );
+
+
 
 const app = express()
-const PORT = process.env.PORT || 5000
-
-var corsOptions = {
-    "origin": "*",
-    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-    "preflightContinue": false,
-    "optionsSuccessStatus": 204
+const corsOptions = {
+    origin: 'http://localhost:3000', 
+    credentials:true,            //access-control-allow-credentials:true
+    optionSuccessStatus:200
   }
 
 //middlewares
 app.use(cors(corsOptions))
+
+app.use(cookieParser())
+const PORT = process.env.PORT || 5000
+
+
 app.use(helmet());
 app.use(logger('tiny'))
 
