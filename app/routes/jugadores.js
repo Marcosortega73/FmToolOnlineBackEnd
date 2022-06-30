@@ -1,5 +1,6 @@
 const express = require('express');
 const verifyToken = require('../middlewares/verifyToken');
+const uploadFile = require('../middlewares/fileManager');
 const router = express.Router();
 const {getItems,getItem,createItems,updateItems,deleteItems} = require('../controllers/jugadores')
 

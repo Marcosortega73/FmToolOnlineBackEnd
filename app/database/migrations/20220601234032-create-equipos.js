@@ -22,6 +22,7 @@ module.exports = {
       },
       manager_id: {
         type: Sequelize.INTEGER,
+        allowNull: true,
         references: {
           model: 'Managers',
           key: 'id'
@@ -31,6 +32,7 @@ module.exports = {
       },
       torneo_id: {
         type: Sequelize.INTEGER,
+        allowNull: true,
         references: {
           model: 'Torneos',
           key: 'id'

@@ -9,6 +9,7 @@ var cors = require('cors')
 var logger = require('morgan')
 
 
+
 //Importar Rutas
 const routes = require('./app/routes')
 
@@ -35,13 +36,14 @@ app.use(logger('tiny'))
 
 //Para leer .json
 app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
 
-
-// app.get('/', (req, res) => res.send('hola mundo'))
 
 //Usar Rutas
 app.use('/api', routes)
+
+
 
 app.listen(PORT, () => console.log(`Comenzando proyecto final en http://localhost:${PORT} !`))
 

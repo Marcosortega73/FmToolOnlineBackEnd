@@ -41,7 +41,7 @@ const createItems = async (req, res) => {
     });
 
     res.json({
-      mensage: "Equipo creado correctamente",
+      message: "Equipo creado correctamente",
       state:200
     });
 
@@ -49,7 +49,77 @@ const createItems = async (req, res) => {
     httpError(res, e);
   }
 };
-const updateItems = (req, res) => {};
-const deleteItems = (req, res) => {};
+const updateItems = async (req, res) => {
+
+  try {
+    const {id,nombre, nacionalidad, manager , torneo} = req.body
+
+    const equipoSelect = await equipos.findOne({where: {id}})
+
+    if(!equipoSelect){
+      return res.json({
+        message: "Equipo no encontrado",
+        state:404
+      });
+    }
+    else {
+
+    equipos.update(
+      {
+        id,
+        nombre,
+        nacionalidad_id:nacionalidad,
+        manager_id:manager,
+        torneo_id:torneo,
+      },
+      { where: { id: id } }
+    );
+
+    res.json({
+      message: "Equipo actualizado correctamente",
+      status:200
+    });
+    }
+
+  } catch (e) {
+    httpError(res, e);
+  }
+
+
+
+
+};
+const deleteItems =async (req, res) => {
+
+  try {
+    const id = req.params.id
+
+    const equipoSelect = await equipos.findOne({where: {id}})
+
+    if(!equipoSelect){
+      return res.json({
+        message: "Equipo no encontrado",
+        state:404
+      });
+    }
+    else {
+
+    equipos.destroy({
+      where: {
+        id: id,
+      },
+    });
+
+    res.json({
+      message: "Equipo eliminado correctamente",
+      status:200
+    });
+    }
+
+  } catch (e) {
+    httpError(res, e);
+  }
+
+};
 
 module.exports = { getItems, getItem, createItems, updateItems, deleteItems };
