@@ -14,6 +14,8 @@ const getItems = async (req, res) => {
 
 const getItem = async (req, res) => {};
 
+
+
 const createItems = async (req, res) => {
   try {
     const { id, nombre, nacionalidad, club, altura, peso, ca, cp, valor } =

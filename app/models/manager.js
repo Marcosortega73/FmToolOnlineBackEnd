@@ -76,12 +76,12 @@ module.exports = (sequelize, DataTypes) => {
     // definir relaciones
     Manager.hasOne(models.Equipo,
         {
-            foreignKey: 'manager_Id',
+            foreignKey: 'manager_id',
           }  );
           
     Manager.belongsTo(models.Nacionalidad,
       {
-        foreignKey: 'nacionalidad_Id',
+        foreignKey: 'nacionalidad_id',
       }
     )
   };

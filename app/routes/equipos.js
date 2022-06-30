@@ -10,10 +10,10 @@ router.get('/:id', getItem)
 router.post('/createEquipo',verifyToken, createItems)
 
 
-router.patch('/:id', updateItems)
+router.put('/:id', updateItems)
 
 
-router.delete('/:id', deleteItems)
+router.delete('/deleteEquipo/:id', deleteItems)
 
 
 module.exports = router

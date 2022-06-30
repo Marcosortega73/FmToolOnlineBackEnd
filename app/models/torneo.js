@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 
      
   }
+  //TIPO ES UNA TABLA AL IGUAL  TEMPORADA, TOTAL  GRUPOS ES ATRIBUTO DE LA TABLA TIPO
   Torneo.init({
     nombre: DataTypes.STRING,
     tipo: DataTypes.STRING,
