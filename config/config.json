@@ -19,5 +19,12 @@
     "database": "database_production",
     "host": "127.0.0.1",
     "dialect": "mysql"
+  },
+  "heroku": {
+    "username": "bcb6be1b495386",
+    "password": "50c5042f",
+    "database": "heroku_a38bc8b481e60ce",
+    "host": "us-cdbr-east-06.cleardb.net",
+    "dialect": "mysql"
   }
 }
