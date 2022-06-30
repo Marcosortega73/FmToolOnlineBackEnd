@@ -38,7 +38,12 @@ app.use(logger('tiny'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
+//Hola mundo
+app.use('/holaMundo', (req, res) => {
 
+    res.send('Hola Mundo')
+}
+)
 
 //Usar Rutas
 app.use('/api', routes)
