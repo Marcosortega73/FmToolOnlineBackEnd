@@ -1,15 +1,15 @@
 
 const { httpError } = require("../helpers/handleError");
 const administrador = require("../models").Administrador;
+const Manager = require("../models").Manager;
 const bcrypt = require("bcrypt");
-
 
 const {generateToken,generateRefreshToken} = require("../utils/tokenManager.js");
 
 
 
 // Refresh Token
-const refreshToken = async (req, res) => {
+/* const refreshToken = async (req, res) => {
   try {
 
     const { token, expiresIn } = generateToken(req.uid);
@@ -20,35 +20,35 @@ const refreshToken = async (req, res) => {
     });
   } 
   
-
   catch (e) {
    
     httpError(res, e);
   }
   
-};
-
-
-//getItems
-const getItems = async (req, res) => {
-  try {
-    const administradores = await administrador.findAll();
-    return res.json({
-      data:administradores
-    });
-  } catch (error) {
-    httpError(res, error);
-  }
-}
-
-
+}; */
 //Login
-const getItem = async (res,adminPassword, password) => {
+const getItem = async (req, res) => {
+  console.log("LLEGANDO")
   try {
-    console.log(req, "REQ ADMIN")
+    const { email,password } = req.body;
+
+    const admin = await administrador.findOne({
+      where: { email: email },
+    });
+    const manager = await Manager.findOne({
+      where: { email: email }
+    });
+
+    if(!admin && !manager){
+      return res.status(400).json({
+        mensaje: "Credenciales incorrectas /U",
+      });
+
+    }
+    else if(admin){
       //Validar Password
       const validPasswordd = await bcrypt.compare(
-        adminPassword,password
+        password,admin.password
       );
       if(!validPasswordd) {
         return res.status(400).json({
@@ -57,13 +57,36 @@ const getItem = async (res,adminPassword, password) => {
       }
       else{
         // generateRefreshToken(admin.id,res);
+      
         const { token, expiresIn } = generateToken(admin.id);
         res.status(200).json({
           token,
           expiresIn
         });
-        
-    } 
+        }
+
+    }
+
+    else if (manager){
+      //Validar Password
+      const validPasswordd = await bcrypt.compare(
+        password,manager.password
+      );
+      if(!validPasswordd) {
+        return res.status(400).json({
+          mensaje: "Credenciales incorrectas /P",
+        }); 
+      }
+
+      else{
+        // generateRefreshToken(admin.id,res); 
+        const { token, expiresIn } = generateToken(manager.id);
+        res.status(200).json({
+          token,
+          expiresIn
+        });
+        }
+    }
   } 
   
   catch (e) {
@@ -110,7 +133,7 @@ const createItems = async (req, res) => {
 };
 
 const getUserAdmin = async(req, res) => {
-  console.log("req.uid")
+  console.log("req.uid",req.uid)
   try {
     console.log
 
@@ -121,8 +144,8 @@ const getUserAdmin = async(req, res) => {
 
     }
     else{
-      const {email, rol,state} = admin
-      res.json({email,rol,state})
+      const {email} = admin
+      res.json({email})
     }
   } 
   

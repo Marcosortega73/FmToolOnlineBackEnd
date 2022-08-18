@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Nacionalidades', {
+    await queryInterface.createTable('Continentes', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -10,13 +10,10 @@ module.exports = {
       },
       nombre: {
         type: Sequelize.STRING
-      },
-      image_id: {
-        type: Sequelize.INTEGER
-      },
+      }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Nacionalidades');
+    await queryInterface.dropTable('Continentes');
   }
 };

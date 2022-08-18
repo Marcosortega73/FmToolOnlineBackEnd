@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
-const administrador = require("../models").administrador;
+const administrador = require("../models").Administrador;
 
 
 const getItems = (req, res) => {

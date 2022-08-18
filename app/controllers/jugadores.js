@@ -1,11 +1,50 @@
 const Sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
+const nacionalidad = require("../models").Nacionalidad;
 const jugador = require("../models").Jugador;
+const Equipo = require("../models").Equipo;
 
 const getItems = async (req, res) => {
   try {
     console.log("LLEGANDO A JUGADORES");
-    const players = await jugador.findAll({ include: [{ all: true }] });
+    const players = await jugador.findAll({
+      include: [
+        {
+            model: Equipo ,
+            include: [nacionalidad], 
+        },
+        {
+          model: nacionalidad,
+        }
+      ],
+    });
+    return res.json({ players });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+const getItemsFilter = async (req, res) => {
+  const { pagina = 0, search = "", cantidadItems = 10 } = req.query;
+
+  const offset = pagina * cantidadItems;
+  const limit = parseInt(cantidadItems);
+  const searchString = `%${search}%`;
+
+  try {
+    const players = await jugador.findAndCountAll({
+      include: [{ all: true }],
+      include: [
+        {
+          model: Equipo,
+          include: [nacionalidad],
+        },
+      ],
+      where: { nombre: { [Sequelize.Op.like]: searchString } },
+      limit: limit,
+      offset: offset,
+    });
+
     return res.json({ players });
   } catch (error) {
     httpError(res, error);
@@ -13,8 +52,6 @@ const getItems = async (req, res) => {
 };
 
 const getItem = async (req, res) => {};
-
-
 
 const createItems = async (req, res) => {
   try {
@@ -44,7 +81,6 @@ const updateItems = (req, res) => {
   try {
     const { id, nombre, nacionalidad, club, altura, peso, ca, cp, valor } =
       req.body;
-
 
     jugador.update(
       {
@@ -106,4 +142,11 @@ const deleteItems = async (req, res) => {
   }
 };
 
-module.exports = { getItems, getItem, createItems, updateItems, deleteItems };
+module.exports = {
+  getItems,
+  getItem,
+  createItems,
+  updateItems,
+  deleteItems,
+  getItemsFilter,
+};

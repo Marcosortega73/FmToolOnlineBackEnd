@@ -6,7 +6,7 @@ const nacionalidad = require("../models").Nacionalidad;
 const getItems = async (req, res) => {
   try{
     const nations = await nacionalidad.findAll(
-      { include : [{all:true}] }
+      {  }
     )
     return res.json({nations})
 

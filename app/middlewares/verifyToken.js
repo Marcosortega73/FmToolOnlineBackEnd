@@ -11,14 +11,12 @@ const verifyToken = (req,res,next) => {
     if(!token){
         throw new Error('No Bearer')
     }
-
     if(token){
         token = token.split(" ")[1];
         console.log(token)
 
         try{
             const payload = jwt.verify(token,process.env.SECRET)
-            console.log("UIDIDIDID",req.uid)
             req.uid = payload.uid
             next()
             
@@ -29,8 +27,6 @@ const verifyToken = (req,res,next) => {
             .send({error:tokenVerificationError[e.message]})
         }
     }
-
-   
 }
 
 module.exports = verifyToken;

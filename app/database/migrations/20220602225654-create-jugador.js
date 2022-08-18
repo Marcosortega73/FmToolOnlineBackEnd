@@ -8,6 +8,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      idFmrte: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       nombre: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -53,6 +57,213 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
+      edad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      posiciones: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      velocidad: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      aceleracion: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      agilidad: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      equilibrio: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      salto: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      habZurda : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      habDiestra : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      formaNatural : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      resistencia : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      fuerza : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pBalonesAereos : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pMandoArea : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pComunicacion : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pExentricidad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pSaquesManos : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pSaquesPuerta : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pUnoContraUno : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pReflejos : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pSalidas : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pSalidaDePuños : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pAgarreBalon : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      agresividad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      anticipacion : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      valentia  : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      serenidad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      concentracion : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      deciciones  : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      determinacion : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      talento : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      influencia : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      desmarques : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      colocacion : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      trabajoEquipo : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      creatividad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      lucha : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      corners : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      centros : { 
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      regate : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      remate : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      primerToque : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      lanzadorFaltas : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      rematesCabeza : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      tirosLejanos : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      saquesLargoLateral : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      marcaje : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      pases : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      penalty : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      entradas : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      tecnica : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      }
+
+
+      
     });
   },
   async down(queryInterface, Sequelize) {

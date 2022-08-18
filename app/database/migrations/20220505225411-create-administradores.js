@@ -6,9 +6,9 @@ module.exports = {
     await queryInterface.createTable('administradores', {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
       },
       email: {
         type: DataTypes.STRING(100),
@@ -21,6 +21,21 @@ module.exports = {
           is: /^[0-9a-f]{64}$/i,
         },
       },
+      rol: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'ADMIN',
+      },
+      state_id: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: 'UserStates',
+          key: 'id'
+        },
+        allowNull: true,
+        defaultValue: 1,
+      },
+
     });
   },
   async down(queryInterface, Sequelize) {

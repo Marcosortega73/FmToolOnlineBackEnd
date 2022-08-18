@@ -8,6 +8,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      idFmrte: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       nombre: {
         type: Sequelize.STRING
       },
@@ -15,16 +19,6 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: {
           model: 'nacionalidades',
-          key: 'id'
-        },
-        onUpdate: 'cascade',
-        onDelete: 'cascade'
-      },
-      manager_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model: 'Managers',
           key: 'id'
         },
         onUpdate: 'cascade',

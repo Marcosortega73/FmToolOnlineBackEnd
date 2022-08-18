@@ -22,12 +22,16 @@ module.exports = (sequelize, DataTypes) => {
       Equipo.belongsTo(models.Nacionalidad, {
         foreignKey: 'nacionalidad_id',
       });
+      //relacion ocn manager 1 a 1
+      Equipo.hasOne(models.Manager, {
+        foreignKey: 'equipo_id',
+      });
 
     }
   }
   Equipo.init({
+    idFmrte: DataTypes.INTEGER,
     nombre: DataTypes.STRING,
-    manager_id: DataTypes.INTEGER,
     nacionalidad_id: DataTypes.INTEGER,
     torneo_id: DataTypes.INTEGER,
   }, {

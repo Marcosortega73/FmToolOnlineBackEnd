@@ -1,53 +1,53 @@
 const Sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
-const manager = require("../models").manager;
-
+const manager = require("../models").Manager;
+const equipos = require("../models").Equipo;
 //encriptar password
 const bcrypt = require("bcrypt");
 const generateToken = require("../utils/tokenManager");
 const saltRounds = 10;
 
-
-
-const getItem = async (req, res) => {
-
+const getItems = async (req, res) => {
   try {
-    const { email } = req.body;
+    const managers = await manager.findAll({ 
+      attributes: ["id","email","username"]
+     });
+    return res.json({ 
 
-    const userManager = await manager.findOne({
-      where: { email: email },
-    });
-console.log("=====>",userManager);
-    if(!userManager) {
-      return res.status(400).json({
-        mensaje: "Usuario no encontrado",
-      });
-    }
-
-    //Generar token
+      data: managers,
     
-    if (userManager) {
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+}
+
+
+const getItem = async (res, reqPasword,paswword) => {
+  try {
+      //Validar Password
       const validPasswordd = await bcrypt.compare(
-        req.body.password,
-        userManager.password
+        reqPasword,paswword
       );
       if(!validPasswordd) {
-      const {token,expiresIn} =  generateToken(userManager.id);
-
-      res.json({
-        token,
-        expiresIn
-        
-      });
+        return res.status(400).json({
+          mensaje: "Credenciales incorrectas /P",
+        }); 
       }
-    } else {
-      throw new Error("No se encontro el manager");
-    }
-  } catch (e) {
+      else{
+        // generateRefreshToken(userManager.id,res);
+        const { token, expiresIn } = generateToken(userManager.id);
+        res.status(200).json({
+          token,
+          expiresIn
+        });
+        
+    } 
+  } 
+  
+  catch (e) {
     httpError(res, e);
   }
-
-
 };
 
 
@@ -60,6 +60,8 @@ const createItems = async (req, res) => {
       password: req.body.password,
     };
 
+    const {equipo_id} = req.body;
+
     if (managerReq.email !== undefined ) {
 
       const existsmanager = await manager.findOne({
@@ -67,19 +69,28 @@ const createItems = async (req, res) => {
         where: { email: managerReq.email },
 
       });
+    const existsequipo = await equipos.findOne({
+      where: { id: equipo_id },
+    });
 
       if (!existsmanager) {
-
         await manager
           .create(managerReq)
           .then((userManager) => {
             console.log(userManager);
+            if(existsequipo){
+              equipos.update(
+                {
+                  manager_id:userManager.id,
+                },
+                { where: { id: equipo_id } }
+              );
+            }
             res.json({
               manager: managerReq,
               mensaje: "Usuario Creado Con Exito",
             });
           })
-
           .catch((e) => {
             {
               httpError(res, e);
@@ -93,7 +104,31 @@ const createItems = async (req, res) => {
     httpError(res, e);
   }
 };
+
+const getUserManager = async(req, res) => {
+
+  try {
+    const userManager = await manager.findOne({where: {id:req.uid}})
+
+    if(!admin){
+      throw new Error('No Existe El Usuario')
+
+    }
+    else{
+      const {email, rol,state} = userManager
+      res.json({email,rol,state})
+    }
+  } 
+  
+  catch (e) {
+   
+    httpError(res, e);
+  }
+
+  
+};
+
 const updateItems = (req, res) => {};
 const deleteItems = (req, res) => {};
 
-module.exports = { getItem, createItems, updateItems, deleteItems };
+module.exports = { getItems,getItem, createItems, updateItems, deleteItems, getUserManager };

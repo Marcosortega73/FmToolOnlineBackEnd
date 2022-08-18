@@ -2,6 +2,7 @@ const Sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
 const equipos = require("../models").Equipo;
 const nacionalidad = require("../models").Nacionalidad;
+const manager = require("../models").Manager;
 
 
 const getItems = async (req, res) => {
@@ -10,6 +11,7 @@ const getItems = async (req, res) => {
     const clubes = await equipos.findAll(
       { include : [{
         model:nacionalidad,
+        model:manager,
       }] }
     )
     return res.json({clubes})
@@ -36,7 +38,6 @@ const createItems = async (req, res) => {
       id,
       nombre,
       nacionalidad_id:nacionalidad,
-      manager_id:manager,
       torneo_id:torneo,
     });
 
@@ -52,7 +53,7 @@ const createItems = async (req, res) => {
 const updateItems = async (req, res) => {
 
   try {
-    const {id,nombre, nacionalidad, manager , torneo} = req.body
+    const {id,nombre, nacionalidad , torneo} = req.body
 
     const equipoSelect = await equipos.findOne({where: {id}})
 
@@ -69,7 +70,6 @@ const updateItems = async (req, res) => {
         id,
         nombre,
         nacionalidad_id:nacionalidad,
-        manager_id:manager,
         torneo_id:torneo,
       },
       { where: { id: id } }
