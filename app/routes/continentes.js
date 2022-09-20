@@ -1,17 +1,13 @@
 const express = require('express');
 const verifyToken = require('../middlewares/verifyToken');
 const router = express.Router();
-const {getItems,getItem,createItems,updateItems,deleteItems,getItemsbyRegion} = require('../controllers/nacionalidades')
+const {getItems,getItem,createItems,updateItems,deleteItems} = require('../controllers/continentes')
 
-router.get('/obtenerNacionalidades', getItems )
+router.get('/obtenerContinentes', getItems )
 
 router.get('/:id', getItem)
 
 router.post('/', createItems)
-
-//nacionalidadxregion
-router.get('/nacionalidadxregion/:id', getItemsbyRegion)
-
 
 router.patch('/:id', updateItems)
 

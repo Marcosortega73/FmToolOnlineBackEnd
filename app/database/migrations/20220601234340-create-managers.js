@@ -42,7 +42,7 @@ module.exports = {
       },
       //equipo_id FK
       equipo_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.BIGINT,
         allowNull: true,
         references: {
           model: 'Equipos',
@@ -59,6 +59,14 @@ module.exports = {
         },
         allowNull: true,
         defaultValue: 1,
+      },
+      equipoFavorito: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      biografia: {
+        type: Sequelize.TEXT,
+        allowNull: true,
       },
       rol: {
         type: Sequelize.STRING,

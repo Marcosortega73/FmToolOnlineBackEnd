@@ -5,7 +5,10 @@ const administrador = require("../models").Administrador;
 const UserState = require("../models").UserState;
 const bcrypt = require("bcrypt");
 
-const {generateToken,generateRefreshToken} = require("../utils/tokenManager.js");
+const {
+  generateToken,
+  generateRefreshToken,
+} = require("../utils/tokenManager.js");
 
 const saltRounds = 10;
 
@@ -321,102 +324,133 @@ const filterUserpending = async (req, res) => {
   }
 };
 
-
 const loginUsers = async (req, res) => {
+  //este es el que funciona
+
+  console.log("entro al login");
+
   try {
     const { email, password } = req.body;
 
     const userManager = await Manager.findOne({
+      include: [{ all: true }],
       where: { email },
     });
 
     const userAdministrador = await administrador.findOne({
+      include: [{ all: true }],
       where: { email },
     });
 
-    console.log(userManager)
-
-if (userAdministrador) {
-
-    const validPasswordd = await bcrypt.compare(
-      password,userAdministrador.password
-    );
-    if(!validPasswordd) {
-      return res.status(400).json({
-        mensaje: "Credenciales incorrectas /P",
-      }); 
-    }
-    else{
+    if (userAdministrador) {
+      const validPasswordd = await bcrypt.compare(
+        password,
+        userAdministrador.password
+      );
+      if (!validPasswordd) {
+        return res.status(400).json({
+          mensaje: "Credenciales incorrectas /P",
+        });
+      }
       // generateRefreshToken(admin.id,res);
       const { token, expiresIn } = generateToken(userAdministrador.id);
       res.status(200).json({
-        token,
-        expiresIn
+        permissions: { token, expiresIn },
+        data: {
+          email: userAdministrador.email,
+          rol: userAdministrador.rol,
+          state: userAdministrador.Estado ? userAdministrador.Estado : null
+        }
       });
-      
-  } 
-  }
-   else if (userManager) {
+    } else if (userManager) {
       const validPasswordd = await bcrypt.compare(
-        password, userManager.password
+        password,
+        userManager.password
       );
       console.log(validPasswordd);
-      if(!validPasswordd) {
+      if (!validPasswordd) {
         return res.status(400).json({
           mensaje: "Contraeña incorrectas /P",
-        }); 
-      }
-      else{
-        // generateRefreshToken(userManager.id,res);
-        const { token, expiresIn } = generateToken(userManager.id);
-        res.status(200).json({
-          token,
-          expiresIn
         });
-        
-    } 
-     
-  }
-    else {
+      }
+
+      const { token, expiresIn } = generateToken(userManager.id);
+      res.status(200).json({
+        permissions: { token, expiresIn },
+        data: {
+          id: userManager.id,
+          email: userManager.email,
+          rol: userManager.rol,
+          username: userManager.username ? userManager.username : null,
+          nombre: userManager.nombre ? userManager.nombre : null,
+          apellido: userManager.apellido ? userManager.apellido : null,
+          nacimiento: userManager.nacimiento ? userManager.nacimiento : null,
+          nacionalidad: userManager.Nacionalidad
+            ? userManager.Nacionalidad
+            : null,
+          equipo: userManager.Equipo ? userManager.Equipo : null,
+          estado: userManager.UserState ? userManager.UserState : null,
+          equipoFavorito: userManager.equipoFavorito
+            ? userManager.equipoFavorito
+            : null,
+          biografia: userManager.biografia ? userManager.biografia : null,
+        },
+      });
+    } else {
       return res.status(500).json({
         message: "Credenciales incorrectas",
         status: 500,
       });
     }
-  } 
-  catch (error) {
+  } catch (error) {
     httpError(res, error);
   }
-}
+};
 
 const getDataUser = async (req, res) => {
   try {
-    const admin = await administrador.findOne({where: {id:req.uid}})
-    const manager = await Manager.findOne({where: {id:req.uid}})
-    console.log("HOLA GENTE")
-    if(admin){
-
-      const {email, rol,state} = admin
-     return res.status(200).json({email,rol,state})
-    }
-    else if(manager){
-      const {email, rol,state} = manager
-     return res.status(200).json({email,rol,state})
-    }
-    else{
-     return res.status(500).json({
+    const admin = await administrador.findOne({  include: [{ all: true }],where: { id: req.uid } });
+    const manager = await Manager.findOne({  include: [{ all: true }],where: { id: req.uid } });
+    console.log("HOLA GENTE");
+    if (admin) {
+      return res.status(200).json({
+        data: {
+          id: userManager.id,
+          email: admin.email,
+          rol: admin.rol,
+          nombre: admin.nombre ? admin.nombre : null,
+          apellido: admin.apellido ? admin.apellido : null,
+        },
+      });
+    } else if (manager) {
+      return res.status(200).json({
+        state: 200,
+        data: {
+          id: manager.id,
+          email: manager.email,
+          rol: manager.rol,
+          username: manager.username ? manager.username : null,
+          nombre: manager.nombre ? manager.nombre : null,
+          apellido: manager.apellido ? manager.apellido : null,
+          nacimiento: manager.nacimiento ? manager.nacimiento : null,
+          nacionalidad: manager.Nacionalidad ? manager.Nacionalidad : null,
+          equipo: manager.Equipo ? manager.Equipo : null,
+          estado: manager.UserState ? manager.UserState : null,
+          equipoFavorito: manager.equipoFavorito
+            ? manager.equipoFavorito
+            : null,
+          biografia: manager.biografia ? manager.biografia : null,
+        },
+      });
+    } else {
+      return res.status(500).json({
         message: "No se encontro el usuario",
         status: 500,
-      })
+      });
     }
-  } 
-  
-  catch (e) {
-   
+  } catch (e) {
     httpError(res, e);
   }
-
-  
 };
 module.exports = {
   registerPending,

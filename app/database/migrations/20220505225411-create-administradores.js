@@ -21,6 +21,10 @@ module.exports = {
           is: /^[0-9a-f]{64}$/i,
         },
       },
+      nombre: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       rol: {
         type: DataTypes.STRING,
         allowNull: false,

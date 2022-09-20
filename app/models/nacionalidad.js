@@ -17,9 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     Nacionalidad.hasMany(models.Manager, {
       foreignKey: 'nacionalidad_id'
     })
-    Nacionalidad.hasMany(models.Torneo, {
-      foreignKey: 'nacionalidad_id'
-    })
+
     //CONTINENTES
     Nacionalidad.belongsTo(models.Continente, {
       foreignKey: 'continente_id',

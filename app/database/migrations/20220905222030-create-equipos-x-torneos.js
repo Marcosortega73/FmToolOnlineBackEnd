@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       equipo_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.BIGINT,
         allowNull: false,
         references: {
           model: 'equipos',

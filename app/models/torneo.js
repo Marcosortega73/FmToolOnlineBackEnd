@@ -15,9 +15,15 @@ module.exports = (sequelize, DataTypes) => {
         through: 'equipo_x_toreno',
         foreignKey: 'torneo_id',
       });
-      Torneo.belongsTo(models.Nacionalidad, {
-        foreignKey: 'nacionalidad_id',
+      Torneo.belongsTo(models.Continente, {
+        foreignKey: 'region_id',
       });
+
+      //season
+      Torneo.belongsTo(models.Season, {
+        foreignKey: 'season_id',
+      });
+
     }
 
      
@@ -26,11 +32,12 @@ module.exports = (sequelize, DataTypes) => {
   Torneo.init({
     idFmrte: DataTypes.INTEGER,
     nombre: DataTypes.STRING,
-    tipo: DataTypes.STRING,
-    nacionalidad_id: DataTypes.INTEGER,
+    tipo_id: DataTypes.INTEGER,
+    region_id: DataTypes.INTEGER,
     total_de_equipos: DataTypes.INTEGER,
     total_grupos: DataTypes.INTEGER,
-    temporada: DataTypes.STRING
+    total_equipos_grupos:DataTypes.INTEGER,
+    season_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Torneo',

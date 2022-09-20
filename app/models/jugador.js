@@ -15,6 +15,20 @@ module.exports = (sequelize, DataTypes) => {
       Jugador.belongsTo(models.Nacionalidad, {
         foreignKey: "nacionalidad_id",
       });
+       //jugador
+       Jugador.hasMany(models.Season, {
+        foreignKey: 'jugador_mvp_id',
+      });
+
+      //jugador goleador
+      Jugador.hasMany(models.Season, {
+        foreignKey: 'jugador_goleador_id',
+      });
+
+      //jugador asistente
+      Jugador.hasMany(models.Season, {
+        foreignKey: 'jugador_asistente_id',
+      });
     }
   }
   Jugador.init(
@@ -22,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       idFmrte:DataTypes.INTEGER,
       nombre: DataTypes.STRING,
       nacionalidad_id: DataTypes.INTEGER,
-      equipo_id: DataTypes.INTEGER,
+      equipo_id: DataTypes.BIGINT,
       altura: DataTypes.STRING,
       peso: DataTypes.STRING,
       ca: DataTypes.INTEGER,
@@ -78,7 +92,18 @@ module.exports = (sequelize, DataTypes) => {
       pases : DataTypes.INTEGER,
       penalty : DataTypes.INTEGER,
       entradas : DataTypes.INTEGER,
-      tecnica : DataTypes.INTEGER
+      tecnica : DataTypes.INTEGER,
+     /*  adadptabilidad : DataTypes.INTEGER,
+      ambicion : DataTypes.INTEGER,
+      resistencia : DataTypes.INTEGER,
+      polemica : DataTypes.INTEGER,
+      lealtad : DataTypes.INTEGER,
+      presion : DataTypes.INTEGER,
+      profesionalidad : DataTypes.INTEGER,
+      deportividad : DataTypes.INTEGER,
+      temperamento : DataTypes.INTEGER,
+      reputacionMundial: DataTypes.INTEGER, */
+    
     },
     {
       sequelize,

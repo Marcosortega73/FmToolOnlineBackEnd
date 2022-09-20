@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   equipo_x_torneo.init({
-    equipo_id: DataTypes.INTEGER,
+    equipo_id: DataTypes.BIGINT,
     torneo_id: DataTypes.INTEGER
   }, {
     sequelize,

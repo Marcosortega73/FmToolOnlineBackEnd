@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
      
-    Equipo.belongsToMany(models.Torneo, {
+  /*   Equipo.belongsToMany(models.Torneo, {
       through: 'equipo_x_toreno',
       foreignKey: 'equipo_id',
-    });
+    }); */
       Equipo.hasMany(models.Jugador, {
         foreignKey: 'equipo_id',
       });
@@ -26,6 +26,17 @@ module.exports = (sequelize, DataTypes) => {
       Equipo.hasOne(models.Manager, {
         foreignKey: 'equipo_id',
       });
+      //relacion con season 1 a 1
+      Equipo.hasOne(models.Season, {
+        foreignKey: 'equipo_campeon_id',
+      });
+
+ 
+
+      //equipo mvp
+      Equipo.hasOne(models.Season, {
+        foreignKey: 'equipo_mvp_id',
+      });
 
     }
   }
@@ -33,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     idFmrte: DataTypes.INTEGER,
     nombre: DataTypes.STRING,
     nacionalidad_id: DataTypes.INTEGER,
-    torneo_id: DataTypes.INTEGER,
+  /*   torneo_id: DataTypes.INTEGER, */
   }, {
     sequelize,
     modelName: 'Equipo',

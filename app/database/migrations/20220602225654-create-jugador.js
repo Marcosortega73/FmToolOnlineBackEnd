@@ -6,7 +6,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.BIGINT
       },
       idFmrte: {
         type: Sequelize.INTEGER,
@@ -27,7 +27,7 @@ module.exports = {
         onDelete: 'cascade'
       },
       equipo_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.BIGINT,
         allowNull: true,
         references: {
           model: 'Equipos',
@@ -260,9 +260,51 @@ module.exports = {
       tecnica : {
         type: Sequelize.INTEGER,
         allowNull: true,
-      }
-
-
+      },
+      adadptabilidad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      ambicion : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      resistencia : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      polemica : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      lealtad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      presion : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      profesionalidad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      deportividad : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      temperamento : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      reputacionMundial : {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      fechaNacimiento : {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
       
     });
   },

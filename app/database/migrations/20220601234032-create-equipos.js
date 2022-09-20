@@ -6,7 +6,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.BIGINT
       },
       idFmrte: {
         type: Sequelize.INTEGER,
@@ -24,16 +24,7 @@ module.exports = {
         onUpdate: 'cascade',
         onDelete: 'cascade'
       },
-      torneo_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model: 'Torneos',
-          key: 'id'
-        },
-        onUpdate: 'cascade',
-        onDelete: 'cascade'
-      },
+   
     });
   },
   async down(queryInterface, Sequelize) {

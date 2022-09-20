@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
       Continente.hasMany(models.Nacionalidad, {
         foreignKey: 'continente_id',
       });
+
+      Continente.hasMany(models.Torneo, {
+        foreignKey: 'region_id'
+      })
     }
   }
   Continente.init({

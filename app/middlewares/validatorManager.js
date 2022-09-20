@@ -40,8 +40,24 @@ const bodyLoginValidator = [
     validationResultExpress
 ];
 
+const formValidator = [
+    body('email', 'Formato de email incorrecto')
+        .trim()
+        .isEmail()
+        .normalizeEmail(),
+    body('nombre', 'El nombre debe tener minimo 3 caracteres')
+        .trim()
+        .isLength({ min: 3 }),
+    body('apellido', 'El apellido debe tener minimo 3 caracteres')
+        .trim()
+        .isLength({ min: 3 }),
+    validationResultExpress
+]
 
 
-module.exports = {bodyRegisterValidator,bodyLoginValidator}
+
+
+
+module.exports = {bodyRegisterValidator,bodyLoginValidator,formValidator}
 
 

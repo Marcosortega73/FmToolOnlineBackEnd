@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
       Manager.belongsTo(models.UserState, {
         foreignKey: 'state_id',
       });
+      Manager.hasMany(models.Season, {
+        foreignKey: 'manager_campeon_id',
+      });
     }
   }
 
@@ -45,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
     },
     equipo_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: true,
     },
     state_id : {
@@ -73,8 +76,17 @@ module.exports = (sequelize, DataTypes) => {
     nacionalidad_id: {
       type: DataTypes.INTEGER,
       allowNull : true,
-    }
+    },
+    equipoFavorito: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    biografia: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   }, 
+
   {
     sequelize,
     modelName: 'Manager',

@@ -1,125 +1,137 @@
-const Sequelize = require("sequelize");
+const sequelize = require("sequelize");
+
 const { httpError } = require("../helpers/handleError");
+const continente = require("../models").Continente;
 const equipos = require("../models").Equipo;
 const nacionalidad = require("../models").Nacionalidad;
 const manager = require("../models").Manager;
 
-
 const getItems = async (req, res) => {
-  try{
-
-    const clubes = await equipos.findAll(
-      { include : [{
-        model:nacionalidad,
-        model:manager,
-      }] }
-    )
-    return res.json({clubes})
-
-}catch(error){
- 
-    httpError(res, error)
-}
-}
-
-
-
-const getItem = async (req, res) => {
-
+  try {
+    const clubes = await equipos.findAll({
+      include: [
+        {
+          all: true,
+        },
+      ],
+    });
+    return res.json({ clubes, status: 200 });
+  } catch (error) {
+    httpError(res, error);
+  }
 };
+
+const getItem = async (req, res) => {};
 
 const createItems = async (req, res) => {
   try {
-    const {id,nombre, nacionalidad, manager , torneo} = req.body
+    const { id, nombre, nacionalidad, manager, torneo } = req.body;
 
- 
-
-   await equipos.create({
+    await equipos.create({
       id,
       nombre,
-      nacionalidad_id:nacionalidad,
-      torneo_id:torneo,
+      nacionalidad_id: nacionalidad,
+      torneo_id: torneo,
     });
 
     res.json({
       message: "Equipo creado correctamente",
-      state:200
+      state: 200,
     });
-
   } catch (e) {
     httpError(res, e);
   }
 };
 const updateItems = async (req, res) => {
-
   try {
-    const {id,nombre, nacionalidad , torneo} = req.body
+    const { id, nombre, nacionalidad, torneo } = req.body;
 
-    const equipoSelect = await equipos.findOne({where: {id}})
+    const equipoSelect = await equipos.findOne({ where: { id } });
 
-    if(!equipoSelect){
+    if (!equipoSelect) {
       return res.json({
         message: "Equipo no encontrado",
-        state:404
+        state: 404,
+      });
+    } else {
+      equipos.update(
+        {
+          id,
+          nombre,
+          nacionalidad_id: nacionalidad,
+          torneo_id: torneo,
+        },
+        { where: { id: id } }
+      );
+
+      res.json({
+        message: "Equipo actualizado correctamente",
+        status: 200,
       });
     }
-    else {
-
-    equipos.update(
-      {
-        id,
-        nombre,
-        nacionalidad_id:nacionalidad,
-        torneo_id:torneo,
-      },
-      { where: { id: id } }
-    );
-
-    res.json({
-      message: "Equipo actualizado correctamente",
-      status:200
-    });
-    }
-
   } catch (e) {
     httpError(res, e);
   }
-
-
-
-
 };
-const deleteItems =async (req, res) => {
 
+const equiposxnacion = async (req, res) => {
   try {
-    const id = req.params.id
+    const { id } = req.params;
 
-    const equipoSelect = await equipos.findOne({where: {id}})
-
-    if(!equipoSelect){
-      return res.json({
-        message: "Equipo no encontrado",
-        state:404
-      });
-    }
-    else {
-
-    equipos.destroy({
-      where: {
-        id: id,
-      },
+    const equiposByNation = await equipos.findAll({
+      where: { nacionalidad_id: id },
+      include: [
+        {
+          model: nacionalidad,
+        },
+      ],
     });
+
+     
+/*    if (equiposRegion?.Nacionalidads?.Equipos.length === 0) {
+      return res.json({
+        message: "No se encontraron equipos",
+        status: 404,
+      });
+    } */
+
+
 
     res.json({
-      message: "Equipo eliminado correctamente",
-      status:200
+      clubes:equiposByNation,
+      status: 200,
     });
-    }
-
   } catch (e) {
     httpError(res, e);
   }
-
 };
 
-module.exports = { getItems, getItem, createItems, updateItems, deleteItems };
+const deleteItems = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const equipoSelect = await equipos.findOne({ where: { id } });
+
+    if (!equipoSelect) {
+      return res.json({
+        message: "Equipo no encontrado",
+        state: 404,
+      });
+    } else {
+      equipos.destroy({
+        where: {
+          id: id,
+        },
+      });
+
+      res.json({
+        message: "Equipo eliminado correctamente",
+        status: 200,
+      });
+    }
+  } catch (e) {
+    httpError(res, e);
+  }
+};
+
+module.exports = { getItems, getItem, createItems, updateItems, deleteItems,equiposxnacion };

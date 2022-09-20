@@ -39,6 +39,9 @@ const getItemsFilter = async (req, res) => {
           model: Equipo,
           include: [nacionalidad],
         },
+        {
+          model: nacionalidad,
+        }
       ],
       where: { nombre: { [Sequelize.Op.like]: searchString } },
       limit: limit,
