@@ -12,8 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Torneo.belongsToMany(models.Equipo, {
-        through: 'equipo_x_toreno',
+        through: 'equipo_x_torneos',
         foreignKey: 'torneo_id',
+        timestamps : false,
       });
       Torneo.belongsTo(models.Continente, {
         foreignKey: 'region_id',
@@ -23,7 +24,15 @@ module.exports = (sequelize, DataTypes) => {
       Torneo.belongsTo(models.Season, {
         foreignKey: 'season_id',
       });
-
+      //clasificacion
+      Torneo.hasOne(models.Clasificacion, {
+        foreignKey: 'torneo_id',
+      });
+      //fixture
+      Torneo.hasMany(models.Fixture, {
+        foreignKey: 'torneo_id',
+      });
+  
     }
 
      
@@ -37,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
     total_de_equipos: DataTypes.INTEGER,
     total_grupos: DataTypes.INTEGER,
     total_equipos_grupos:DataTypes.INTEGER,
+    rondas: DataTypes.INTEGER,
     season_id: DataTypes.INTEGER
   }, {
     sequelize,

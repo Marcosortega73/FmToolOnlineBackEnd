@@ -1,25 +1,24 @@
 const express = require('express');
 const verifyToken = require('../middlewares/verifyToken');
 const router = express.Router();
-const {getItems,getItemById,createItems,updateItems,deleteItems,getTiposTorneos,createEquiposByTorneo} = require('../controllers/torneos')
+const {getItems,getItem,createItems,updateItems,deleteItems,confirmCretateFixture} = require('../controllers/fixture')
 
 router.get('/obtenerTorneos', getItems )
 
+router.get('/:id', getItem)
 
-router.post('/crearTorneo', createItems)
+router.post('/crearFixture', createItems)
+
+router.post('/confirmarFixture', confirmCretateFixture)
+
 
 //getTiposTorneos
 router.post('/tipo', getItems)
-
-//getTorneoById
-router.get('/obtenerTorneo/:id', getItemById)
 
 
 router.patch('/actualizarTorneo/:id', updateItems)
 
 router.delete('eliminarTorneo/:id', deleteItems)
-
-router.post('/crearEquiposByTorneo', createEquiposByTorneo)
 
 
 

@@ -25,6 +25,9 @@ module.exports = {
           key: 'id'
         }
       },
+      grupo: {
+        type: Sequelize.STRING
+      },
     });
   },
   async down(queryInterface, Sequelize) {

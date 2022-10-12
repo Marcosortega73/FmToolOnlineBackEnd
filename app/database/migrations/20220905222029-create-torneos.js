@@ -38,6 +38,9 @@ module.exports = {
       total_grupos: {
         type: Sequelize.INTEGER
       },
+      rondas: {
+        type: Sequelize.INTEGER
+      },
       season_id: {
         type: Sequelize.INTEGER,
         references: {
