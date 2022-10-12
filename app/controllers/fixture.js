@@ -88,6 +88,7 @@ const createItems = async (req, res) => {
         console.log("PARTIDO", partido);
 
         if (fixtureCreate.length > 0 && fecha > 1) {
+
           existPartido = fixtureCreate.filter((item) => {
             return (
               (item.local == local && item.visitante == visitante) ||
@@ -97,8 +98,9 @@ const createItems = async (req, res) => {
           console.log("Existe Partido", existPartido);
 
           while (existPartido.length > 0) {
+
             if (equiposfecha.length > 0) {
-              console.log("Equipos fecha else", equiposfecha.length - 1);
+              console.log("Equipos fecha else exist", equiposfecha.length - 1);
               indiceLocal = Math.ceil(Math.random() * equiposfecha.length - 1);
               indiceVisitante = Math.ceil(
                 Math.random() * equiposfecha.length - 1
