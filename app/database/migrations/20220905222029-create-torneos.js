@@ -8,16 +8,25 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      idFmrte: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       nombre: {
         type: Sequelize.STRING
       },
-      tipo: {
-        type: Sequelize.STRING
+      tipo_id: {
+        type: Sequelize.INTEGER,
+        references:{
+          model: 'TipoTorneos',
+          key: 'id'
+        },
+        allowNull: true,
       },
-      nacionalidad_id: {
+      region_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'nacionalidades',
+          model: 'continentes',
           key: 'id'
         },
         onUpdate: 'cascade',
@@ -29,8 +38,20 @@ module.exports = {
       total_grupos: {
         type: Sequelize.INTEGER
       },
-      temporada: {
-        type: Sequelize.STRING
+      rondas: {
+        type: Sequelize.INTEGER
+      },
+      season_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Seasons',
+          key: 'id'
+        },
+        allowNull: true,
+      },
+      total_equipos_grupos: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
     });
   },

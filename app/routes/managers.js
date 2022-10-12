@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {getItem,createItems,updateItems,deleteItems} = require('../controllers/managers.js')
+const {getItems,createItems,updateItems,deleteItems} = require('../controllers/managers.js')
 
-router.get('/', getItem )
-router.post('/', createItems)
+router.get('/obtenerManagers', getItems )
+router.post('/register', createItems)
 router.patch('/:id', updateItems)
 router.delete('/:id', deleteItems)
 

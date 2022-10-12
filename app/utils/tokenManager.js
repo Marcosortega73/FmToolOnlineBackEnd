@@ -10,6 +10,10 @@ const generateToken = (uid) => {
     }
 }
 
+
+
+
+
 const generateRefreshToken = (uid,res) => {
     const expiresIn = 60 * 60 * 24 * 30;
     try {

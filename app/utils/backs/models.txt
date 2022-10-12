@@ -1,0 +1,163 @@
+/* "use strict";
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+module.exports = (sequelize, DataTypes) => {
+  const Administrador = sequelize.define(
+    "administrador",
+    {
+      id: {
+        allowNull: false,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+        type: DataTypes.UUID,
+      },
+      email: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        unique: true,
+      },
+      password: {
+        type: DataTypes.TEXT,
+        // validate: {
+        //   is: /^[a-z]+$/i,
+        //   notEmpty: true,
+        // },
+      },
+      rol: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'ADMIN',
+      },
+    },
+    {
+      timestamps: false,
+      freezeTableName: true,
+      tableName: "administradores",
+       hooks: {
+        beforeCreate: async (administrador) => {
+            if (administrador.password) {
+                const salt = await bcrypt.genSaltSync(10, 'a');
+                administrador.password = await bcrypt.hashSync(administrador.password, salt);
+            }
+        },
+        beforeUpdate: async (administrador) => {
+            if (administrador.password) {
+                const salt = await bcrypt.genSaltSync(10, 'a');
+                administrador.password = await bcrypt.hashSync(administrador.password, salt);
+            }
+        }
+    }, 
+    
+    }
+  );
+
+  
+  Administrador.associate = function (models) {
+    // definir relaciones
+  };
+
+  return Administrador;
+}; */
+
+
+
+
+
+MANAGER
+
+/* "use strict";
+const bcrypt = require("bcrypt");
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+  const Manager = sequelize.define(
+    "manager",
+    {
+      id: {
+        allowNull: false,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+        type: DataTypes.UUID,
+      },
+      email: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        unique: true,
+      },
+      password: {
+        type: DataTypes.TEXT,
+        // validate: {
+        //   is: /^[a-z]+$/i,
+        //   notEmpty: true,
+        // },
+      },
+      username: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+      },
+      rol: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'MANAGER',
+      },
+      nombre: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      apellido: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      nacimiento: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+    },
+    {
+      timestamps: false,
+      freezeTableName: true,
+      tableName: "managers",
+      hooks: {
+        beforeCreate: async (manager) => {
+          if (manager.password) {
+            const salt = await bcrypt.genSaltSync(10, "a");
+            manager.password = await bcrypt.hashSync(manager.password, salt);
+          }
+        },
+        beforeUpdate: async (manager) => {
+          if (manager.password) {
+            const salt = await bcrypt.genSaltSync(10, "a");
+            manager.password = await bcrypt.hashSync(manager.password, salt);
+          }
+        },
+      },
+
+      instanceMethods: {
+        validPassword: (password) => {
+          return bcrypt.compareSync(password, this.password);
+        },
+      },
+    }
+  );
+
+  Manager.validPassword = (password) => {
+    return bcrypt.compareSync(password, this.password);
+  };
+
+  Manager.associate = function (models) {
+    // definir relaciones
+    Manager.hasOne(models.Equipo,
+        {
+            foreignKey: 'manager_id',
+          }  );
+          
+    Manager.belongsTo(models.Nacionalidad,
+      {
+        foreignKey: 'nacionalidad_id',
+      }
+    )
+  };
+
+  return Manager;
+};
+ */

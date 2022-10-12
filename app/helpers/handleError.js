@@ -2,7 +2,7 @@ const res = require("express/lib/response");
 
 const httpError = (res,err)=>{
     console.log(err)
-    res.status(500);
+    res.status(500,err);
     res.send({error:'Error en el Servidor'})
 }
 
@@ -56,8 +56,9 @@ const messageError = (codigo) =>{
             return 'No se pudo obtener el usuario por id'
         case 007:
             return 'No se pudo obtener el usuario por nombre'
-        case 008:
-            return 'No se pudo obtener el usuario por email'
+            break;
+      /*   case 008:
+            return 'No se pudo obtener el usuario por email';
         case 009:
             return 'No se pudo obtener el usuario por password'
         case 010:
@@ -91,8 +92,7 @@ const messageError = (codigo) =>{
         case 024:
             return 'No se pudo obtener el usuario por id'
         case 025:
-            return 'No se pudo obtener el usuario por id'
-        
+            return 'No se pudo obtener el usuario por id' */ 
             default:
             return 'Error en el Servidor'
     }

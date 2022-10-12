@@ -12,24 +12,42 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Torneo.belongsToMany(models.Equipo, {
-        through: 'equipo_x_toreno',
+        through: 'equipo_x_torneos',
+        foreignKey: 'torneo_id',
+        timestamps : false,
+      });
+      Torneo.belongsTo(models.Continente, {
+        foreignKey: 'region_id',
+      });
+
+      //season
+      Torneo.belongsTo(models.Season, {
+        foreignKey: 'season_id',
+      });
+      //clasificacion
+      Torneo.hasOne(models.Clasificacion, {
         foreignKey: 'torneo_id',
       });
-      Torneo.belongsTo(models.Nacionalidad, {
-        foreignKey: 'nacionalidad_id',
+      //fixture
+      Torneo.hasMany(models.Fixture, {
+        foreignKey: 'torneo_id',
       });
+  
     }
 
      
   }
   //TIPO ES UNA TABLA AL IGUAL  TEMPORADA, TOTAL  GRUPOS ES ATRIBUTO DE LA TABLA TIPO
   Torneo.init({
+    idFmrte: DataTypes.INTEGER,
     nombre: DataTypes.STRING,
-    tipo: DataTypes.STRING,
-    nacionalidad_id: DataTypes.INTEGER,
+    tipo_id: DataTypes.INTEGER,
+    region_id: DataTypes.INTEGER,
     total_de_equipos: DataTypes.INTEGER,
     total_grupos: DataTypes.INTEGER,
-    temporada: DataTypes.STRING
+    total_equipos_grupos:DataTypes.INTEGER,
+    rondas: DataTypes.INTEGER,
+    season_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Torneo',

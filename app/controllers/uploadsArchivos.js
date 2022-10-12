@@ -6,23 +6,86 @@ const XLSX = require("xlsx");
 
 // Todo:Realizar controles de errores
 
-const createJugadoresBase = async (req, res) => {
+const createJugadoresBase = async (req, res) => 
+{
   const workbook = XLSX.readFile(req.file.path);
   const sheet_name_list = workbook.SheetNames;
   const worksheet = workbook.Sheets[sheet_name_list[0]];
   const data = XLSX.utils.sheet_to_json(worksheet);
 
-  var jugadoresBase = await data.map((jugador) => {
-    return {
-      nombre: jugador.nombre,
-      nacionalidad_id: jugador.nacionalidad_id,
-      equipo_id: jugador.equipo_id ? jugador.equipo_id : null,
-      altura: jugador.altura,
-      peso: jugador.peso,
-      ca: jugador.ca,
-      cp: jugador.cp,
-      valor: jugador.valor,
+
+  var jugadoresBase = await data.map( (jugador) => {
+    //obtener id de equipo por nombre
+
+    if(jugador){
+       return {
+      id: jugador.idFmrte?jugador.idFmrte:null,
+      idFmrte: jugador.idFmrte?jugador.idFmrte:null,
+      nombre: jugador.nombre ? jugador.nombre : null,
+      nacionalidad_id: jugador.nacionalidad_id ? jugador.nacionalidad_id : null,
+      equipo_id: jugador.equipo_id ? jugador.equipo_id: 1,
+      altura: jugador.altura ? jugador.altura : null,
+      peso: jugador.peso ? jugador.peso : null,
+      ca: jugador.ca ? jugador.ca : null,
+      cp: jugador.cp ? jugador.cp : null,
+      valor: jugador.valor ? jugador.valor : null,
+      edad: jugador.edad ? jugador.edad : null,
+      posiciones:jugador.posiciones ? jugador.posiciones : null,
+      velocidad: jugador.velocidad ? jugador.velocidad : null,
+      aceleracion: jugador.aceleracion ? jugador.aceleracion : null,
+      agilidad: jugador.agilidad ? jugador.agilidad : null,
+      equilibrio: jugador.equilibrio ? jugador.equilibrio : null,
+      salto: jugador.salto ? jugador.salto : null,
+      habZurda : jugador.habZurda  ? jugador.habZurda : null,
+      habDiestra : jugador.habDiestra ? jugador.habDiestra : null,
+      formaNatural : jugador.formaNatural ? jugador.formaNatural : null,
+      resistencia : jugador.resistencia ? jugador.resistencia : null,
+      fuerza : jugador.fuerza ? jugador.fuerza : null,
+      pBalonesAereos : jugador.pBalonesAereos ? jugador.pBalonesAereos : null,
+      pMandoArea : jugador.pMandoArea ? jugador.pMandoArea : null,
+      pComunicacion : jugador.pComunicacion ? jugador.pComunicacion : null,
+      pExentricidad : jugador.pExentricidad ? jugador.pExentricidad : null,
+      pSaquesManos : jugador.pSaquesManos ? jugador.pSaquesManos : null,
+      pSaquesPuerta : jugador.pSaquesPuerta ? jugador.pSaquesPuerta : null,
+      pUnoContraUno : jugador.pUnoContraUno ? jugador.pUnoContraUno : null,
+      pReflejos : jugador.pReflejos ? jugador.pReflejos : null,
+      pSalidas : jugador.pSalidas ? jugador.pSalidas : null,
+      pSalidaDePunios : jugador.pSalidaDePunios ? jugador.pSalidaDePunios : null,
+      pAgarreBalon : jugador.pAgarreBalon ? jugador.pAgarreBalon : null,
+      agresividad : jugador.agresividad ? jugador.agresividad : null,
+      anticipacion : jugador.anticipacion ? jugador.anticipacion : null,
+      valentia : jugador.valentia  ? jugador.valentia : null,
+      serenidad : jugador.serenidad ? jugador.serenidad : null,
+      concentracion : jugador.concentracion ? jugador.concentracion : null,
+      deciciones : jugador.deciciones ? jugador.deciciones : null,
+      determinacion : jugador.determinacion ? jugador.determinacion : null,
+      talento : jugador.talento ? jugador.talento : null,
+      influencia : jugador.influencia ? jugador.influencia : null,
+      desmarques : jugador.desmarques ? jugador.desmarques : null,
+      colocacion : jugador.colocacion ? jugador.colocacion : null,
+      trabajoEquipo : jugador.trabajoEquipo ? jugador.trabajoEquipo : null,
+      creatividad : jugador.creatividad ? jugador.creatividad : null,
+      lucha : jugador.lucha ? jugador.lucha : null,
+      corners : jugador.corners ? jugador.corners : null,
+      centros : jugador.centros ? jugador.centros : null,
+      regate : jugador.regate ? jugador.regate : null,
+      remate : jugador.remate ? jugador.remate : null,
+      primerToque : jugador.primerToque ? jugador.primerToque : null,
+      lanzadorFaltas : jugador.lanzadorFaltas ? jugador.lanzadorFaltas : null,
+      rematesCabeza : jugador.rematesCabeza ? jugador.rematesCabeza : null,
+      tirosLejanos : jugador.tirosLejanos ? jugador.tirosLejanos : null,
+      saquesLargoLateral : jugador.saquesLargoLateral ? jugador.saquesLargoLateral : null,
+      marcaje : jugador.marcaje ? jugador.marcaje : null,
+      pases : jugador.pases ? jugador.pases : null,
+      penalty : jugador.penalty ? jugador.penalty : null,
+      entradas : jugador.entradas ? jugador.entradas : null,
+      tecnica :jugador.tecnica ? jugador.tecnica : null,
     };
+    }
+    else {
+      return null;
+    }	
+   
   });
 
   try {
@@ -38,7 +101,7 @@ const createJugadoresBase = async (req, res) => {
           }
         });
       });
-    }
+    } 
     if (jugadoresBase.length > 0) {
       await jugador.bulkCreate(jugadoresBase);
       res.json({
@@ -62,10 +125,10 @@ const createEquiposBase = async (req, res) => {
   try {
     const equiposBase = await data.map((equipo) => {
       return {
+        idFmrte: equipo.idFmrte ? equipo.idFmrte : null,
         nombre: equipo.nombre,
         nacionalidad_id: equipo.nacionalidad_id,
-        equipo_id: equipo.equipo_id,
-        manager_id: equipo.manager_id ? equipo.manager_id : null,
+        id: equipo.id,
         torneo_id: equipo.torneo_id ? equipo.torneo_id : null,
       };
     });

@@ -4,11 +4,6 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Nacionalidad extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       // define association here
       Nacionalidad.hasMany(models.Equipo, {
@@ -19,22 +14,27 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'nacionalidad_id'
     });
     
-    Nacionalidad.hasMany(models.manager, {
-      foreignKey: 'nacionalidad_id'
-    })
-    Nacionalidad.hasMany(models.Torneo, {
+    Nacionalidad.hasMany(models.Manager, {
       foreignKey: 'nacionalidad_id'
     })
 
-
+    //CONTINENTES
+    Nacionalidad.belongsTo(models.Continente, {
+      foreignKey: 'continente_id',
+    })
     }
   }
   Nacionalidad.init({
+    idFmrte: DataTypes.INTEGER,
     nombre: DataTypes.STRING,
-    image_id: DataTypes.INTEGER
+    image_id: DataTypes.INTEGER,
+    gentilicio: DataTypes.STRING,
+    nombreCorto: DataTypes.STRING,
+    continente_id: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Nacionalidad',
+    tableName: 'nacionalidades',
     timestamps : false,
   });
   return Nacionalidad;

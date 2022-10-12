@@ -1,9 +1,8 @@
-const Sequelize = require("sequelize");
+
 const { httpError } = require("../helpers/handleError");
-const administrador = require("../models").administrador;
-const jwt = require("jsonwebtoken");
+const administrador = require("../models").Administrador;
 const bcrypt = require("bcrypt");
-const { tokenVerificationError } = require('../utils/tokenManager.js');
+
 
 const {generateToken,generateRefreshToken} = require("../utils/tokenManager.js");
 
@@ -21,6 +20,7 @@ const refreshToken = async (req, res) => {
     });
   } 
   
+
   catch (e) {
    
     httpError(res, e);
@@ -29,43 +29,40 @@ const refreshToken = async (req, res) => {
 };
 
 
+//getItems
+const getItems = async (req, res) => {
+  try {
+    const administradores = await administrador.findAll();
+    return res.json({
+      data:administradores
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+}
+
 
 //Login
-const getItem = async (req, res) => {
-  console.log("LLEGANDO")
+const getItem = async (res,adminPassword, password) => {
   try {
-    const { email,password } = req.body;
-
-    const admin = await administrador.findOne({
-      where: { email: email },
-    });
-
-    if(!admin) {
-      return res.status(400).json({
-        mensaje: "Credenciales incorrectas /U",
-      });
-    }
-    else{
+    console.log(req, "REQ ADMIN")
       //Validar Password
       const validPasswordd = await bcrypt.compare(
-        password,admin.password
+        adminPassword,password
       );
       if(!validPasswordd) {
         return res.status(400).json({
           mensaje: "Credenciales incorrectas /P",
         }); 
       }
-
       else{
         // generateRefreshToken(admin.id,res);
-      
         const { token, expiresIn } = generateToken(admin.id);
-        console.log("LLEGANDO")
         res.status(200).json({
           token,
           expiresIn
         });
-        }
+        
     } 
   } 
   
@@ -113,7 +110,7 @@ const createItems = async (req, res) => {
 };
 
 const getUserAdmin = async(req, res) => {
-  console.log("req.uid",req.uid)
+  console.log("req.uid")
   try {
     console.log
 
@@ -124,8 +121,8 @@ const getUserAdmin = async(req, res) => {
 
     }
     else{
-      const {email} = admin
-      res.json({email})
+      const {email, rol,state} = admin
+      res.json({email,rol,state})
     }
   } 
   
@@ -150,4 +147,4 @@ const logout = (req, res) => {
   });
 };
 
-module.exports = { refreshToken,logout, getItem, createItems, updateItems, deleteItems,getUserAdmin };
+module.exports = { refreshToken,logout, getItem,getItems, createItems, updateItems, deleteItems,getUserAdmin };
