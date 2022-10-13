@@ -27,20 +27,59 @@ const createItems = async (req, res) => {
     if (!torneoSelect) {
       return res.json({ message: "Torneo no encontrado", status: 404 });
     }
+
     //crear sorteo de numero de fechas
     const numeroEquipos = equipos.length;
     let numeroFechas = numeroEquipos - 1;
     let numeroPartidosFecha = numeroEquipos / 2;
+
     if (numeroEquipos % 2 != 0) {
       return res.json({
         message: "El numero de equipos debe ser par",
         status: 400,
       });
     }
+
     //crear fixture
 
     //sorteo
     const equiposSorteados = equipos.sort(() => Math.random() - 0.5);
+
+    const fixtures = equiposSorteados.map((equipo, index) => {
+      //partidos por fecha
+      let fecha  = index +1
+      let partidos = [];
+      for (let i = 0; i < numeroPartidosFecha; i++) {
+        let partido = {
+          equipo_local_id: equipo.id,
+          equipo_visitante_id: equiposSorteados[
+            (index + i + 1) % equiposSorteados.length
+          ].id,
+          fecha: fecha,
+          torneo_id: torneo_id,
+        };
+        partidos.push(partido);
+      }
+      return partidos;
+    });
+
+   /*    return {
+        torneo_id: torneo_id,
+        fecha: index + 1,
+        fecha_desde: fecha_desde,
+        fecha_hasta: fecha_hasta,
+        equipo_local_id: equipo.id,
+        equipo_visitante_id: equiposSorteados[index + 1]
+          ? equiposSorteados[index + 1].id
+          : equiposSorteados[0].id,
+        estado: "Pendiente",
+      };
+    }); */
+
+    if(fixtures.length>0){
+      return res.json({ fixtures, status: 200 });
+    }
+
 
     console.log("Equipos Sorteados", equiposSorteados);
 
@@ -51,34 +90,49 @@ const createItems = async (req, res) => {
     let indiceVisitante;
     let local;
     let visitante;
+
     //crear fixture por fecha
 
     for (let i = 0; i < numeroFechas; i++) {
       let fecha = i + 1;
 
       equiposfecha = equiposfecha.concat(equipos);
-      console.log("Equipos equiposfechaequiposfecha", equiposfecha);
+
+      console.log("Equipos concat equipos", equiposfecha);
 
       for (let j = 0; j < numeroPartidosFecha; j++) {
         let partido = j + 1;
         //indice random
 
-        console.log("Equipos fecha", equiposfecha.length);
+        console.log("Equipos Length", equiposfecha.length);
+
         //validar que no se repitan los equipos
         if (equiposfecha.length == 2) {
           indiceLocal = 0;
           indiceVisitante = 1;
         } else if (equiposfecha.length > 0) {
-          console.log("Equipos fecha else", equiposfecha.length - 1);
+          console.log(
+            "Equipos Lengt primer fecha else",
+            equiposfecha.length - 1
+          );
+
           indiceLocal = Math.ceil(Math.random() * equiposfecha.length - 1);
           indiceVisitante = Math.ceil(Math.random() * equiposfecha.length - 1);
 
-          while (indiceLocal == indiceVisitante) {
-            indiceVisitante = Math.ceil(
+          if (indiceLocal == indiceVisitante) {
+            /*   indiceVisitante = Math.ceil(
               Math.random() * equiposfecha.length - 1
+            ); */
+
+            indiceVisitante = equiposfecha.findIndex(
+              (item,index) => index != indiceLocal
             );
+
+            console.log("indice local", indiceLocal);
+            console.log("Indice Visitante SOME",indiceVisitante)
           }
         }
+
         //obtener equipos
         local = equiposfecha[indiceLocal];
         visitante = equiposfecha[indiceVisitante];
@@ -88,7 +142,6 @@ const createItems = async (req, res) => {
         console.log("PARTIDO", partido);
 
         if (fixtureCreate.length > 0 && fecha > 1) {
-
           existPartido = fixtureCreate.filter((item) => {
             return (
               (item.local == local && item.visitante == visitante) ||
@@ -97,31 +150,23 @@ const createItems = async (req, res) => {
           });
           console.log("Existe Partido", existPartido);
 
-          while (existPartido.length > 0) {
+          if (existPartido.length > 0) {
+            console.log("Existe Partido IF", existPartido);
 
-            if (equiposfecha.length > 0) {
-              console.log("Equipos fecha else exist", equiposfecha.length - 1);
-              indiceLocal = Math.ceil(Math.random() * equiposfecha.length - 1);
-              indiceVisitante = Math.ceil(
-                Math.random() * equiposfecha.length - 1
-              );
-
-              while (indiceLocal == indiceVisitante) {
-                indiceVisitante = Math.ceil(
-                  Math.random() * equiposfecha.length - 1
-                );
-              }
-            }
-            //obtener equipos
-            local = equiposfecha[indiceLocal];
-            visitante = equiposfecha[indiceVisitante];
-            existPartido = fixtureCreate.filter((item) => {
-              return (
-                (item.local == local && item.visitante == visitante) ||
-                (item.local == visitante && item.visitante == local)
-              );
-            });
+            //no pueden jugar los mismo partidos 
+            
+            visitante = equipos.find(
+              (item,index) => ((item != local) &&
+              (existPartido[0].local != item && existPartido[0].visitante != item))
+            );
+            indiceVisitante = equiposfecha.findIndex((item)=> item == visitante)
+            
+            console.log("Local Exist",existPartido[0].local,"VISITANTE EXIST",existPartido[0].visitante )
+            console.log("Visitante EXISTE",indiceVisitante)
+            console.log("EQUIPO VISITATE EN EL EXISTE",visitante)
           }
+
+
         }
         let fixture = {
           fecha: fecha,
@@ -145,7 +190,7 @@ const createItems = async (req, res) => {
 
         //validar que no se repitan los partidos
 
-        console.log("fixtureCreate", fixtureCreate);
+        console.log("fixtureCreate Finaliza", fixtureCreate);
 
         //crear fixture
       }
