@@ -5,6 +5,11 @@ const {getItems,getItem,createItems,updateItems,deleteItems,confirmCretateFixtur
 
 router.get('/obtenerTorneos', getItems )
 
+//prueba
+/* router.get('/get', ((req,res)=>{
+    res.send('hola')
+}) ) */
+
 router.get('/:id', getItem)
 
 router.post('/crearFixture', createItems)

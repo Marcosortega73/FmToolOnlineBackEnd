@@ -17,12 +17,20 @@ const createItems = async (req, res) => {
   try {
     const { equipos, torneo_id, fecha_desde, fecha_hasta, rondas } = req.body;
 
-    const torneoSelect = await torneo.findOne({
+   /*  const torneoSelect = await torneo.findOne({
       where: {
         id: torneo_id,
       },
       include: [{ all: true }],
-    });
+    }); */
+
+   
+ //prueba sin base de datos
+    const torneoSelect = {
+      id: 1,
+      nombre: "Torneo de prueba",
+    };
+
 
     if (!torneoSelect) {
       return res.json({ message: "Torneo no encontrado", status: 404 });
@@ -45,42 +53,6 @@ const createItems = async (req, res) => {
     //sorteo
     const equiposSorteados = equipos.sort(() => Math.random() - 0.5);
 
-    const fixtures = equiposSorteados.map((equipo, index) => {
-      //partidos por fecha
-      let fecha  = index +1
-      let partidos = [];
-      for (let i = 0; i < numeroPartidosFecha; i++) {
-        let partido = {
-          equipo_local_id: equipo.id,
-          equipo_visitante_id: equiposSorteados[
-            (index + i + 1) % equiposSorteados.length
-          ].id,
-          fecha: fecha,
-          torneo_id: torneo_id,
-        };
-        partidos.push(partido);
-      }
-      return partidos;
-    });
-
-   /*    return {
-        torneo_id: torneo_id,
-        fecha: index + 1,
-        fecha_desde: fecha_desde,
-        fecha_hasta: fecha_hasta,
-        equipo_local_id: equipo.id,
-        equipo_visitante_id: equiposSorteados[index + 1]
-          ? equiposSorteados[index + 1].id
-          : equiposSorteados[0].id,
-        estado: "Pendiente",
-      };
-    }); */
-
-    if(fixtures.length>0){
-      return res.json({ fixtures, status: 200 });
-    }
-
-
     console.log("Equipos Sorteados", equiposSorteados);
 
     let fixtureCreate = [];
@@ -101,9 +73,10 @@ const createItems = async (req, res) => {
       console.log("Equipos concat equipos", equiposfecha);
 
       for (let j = 0; j < numeroPartidosFecha; j++) {
-        let partido = j + 1;
-        //indice random
 
+        let partido = j + 1;
+
+        //indice random
         console.log("Equipos Length", equiposfecha.length);
 
         //validar que no se repitan los equipos
@@ -115,60 +88,32 @@ const createItems = async (req, res) => {
             "Equipos Lengt primer fecha else",
             equiposfecha.length - 1
           );
-
           indiceLocal = Math.ceil(Math.random() * equiposfecha.length - 1);
-          indiceVisitante = Math.ceil(Math.random() * equiposfecha.length - 1);
-
-          if (indiceLocal == indiceVisitante) {
-            /*   indiceVisitante = Math.ceil(
-              Math.random() * equiposfecha.length - 1
-            ); */
-
-            indiceVisitante = equiposfecha.findIndex(
-              (item,index) => index != indiceLocal
-            );
-
-            console.log("indice local", indiceLocal);
-            console.log("Indice Visitante SOME",indiceVisitante)
-          }
         }
 
-        //obtener equipos
-        local = equiposfecha[indiceLocal];
-        visitante = equiposfecha[indiceVisitante];
 
-        console.log(local, " vs ", visitante);
+        //obtener equipos reales
+        local = equiposfecha[indiceLocal];
 
         console.log("PARTIDO", partido);
 
-        if (fixtureCreate.length > 0 && fecha > 1) {
-          existPartido = fixtureCreate.filter((item) => {
-            return (
-              (item.local == local && item.visitante == visitante) ||
-              (item.local == visitante && item.visitante == local)
-            );
-          });
-          console.log("Existe Partido", existPartido);
-
-          if (existPartido.length > 0) {
-            console.log("Existe Partido IF", existPartido);
-
             //no pueden jugar los mismo partidos 
-            
-            visitante = equipos.find(
-              (item,index) => ((item != local) &&
-              (existPartido[0].local != item && existPartido[0].visitante != item))
+            visitante = equiposfecha.find(
+              (item,index) => ((item != local) 
+              &&(
+                  fixtureCreate.filter((element) => {
+                    return (
+                      (element.local == local && element.visitante == item) ||
+                      (element.local == item && element.visitante == local)
+                    );
+                  }).length == 0
+              )
+              )
             );
+
             indiceVisitante = equiposfecha.findIndex((item)=> item == visitante)
             
-            console.log("Local Exist",existPartido[0].local,"VISITANTE EXIST",existPartido[0].visitante )
-            console.log("Visitante EXISTE",indiceVisitante)
-            console.log("EQUIPO VISITATE EN EL EXISTE",visitante)
-          }
-
-
-        }
-        let fixture = {
+        let fixturePartial = {
           fecha: fecha,
           partido: partido,
           local: local,
@@ -177,8 +122,7 @@ const createItems = async (req, res) => {
           fecha_desde: fecha_desde,
           fecha_hasta: fecha_hasta,
         };
-
-        fixtureCreate.push(fixture);
+        fixtureCreate.push(fixturePartial);
 
         //eliminar equipos de la lista filter
         equiposfecha = equiposfecha.filter(
@@ -188,90 +132,43 @@ const createItems = async (req, res) => {
         console.log("Equipos fecha splice", equiposfecha);
         console.log("fecha", fecha);
 
-        //validar que no se repitan los partidos
-
         console.log("fixtureCreate Finaliza", fixtureCreate);
-
-        //crear fixture
       }
 
-      //no se repitan los partidos en la fecha
-      //agrupar los que ya jugaron
-
-      //agrupar los que ya jugaron
     }
+
+    //RONDAS MAYORES A 1
     if (rondas > 1) {
       //invierte equipos
+      console.log("RONDAS",rondas)
       for (let k = 0; k < rondas - 1; k++) {
+
         for (let i = 0; i < numeroFechas; i++) {
+
           let fecha = i + 1 + numeroFechas * (k + 1);
-          for (let j = 0; j < numeroPartidosFecha; j++) {
-            let partido = j + 1;
+
+          for (let j = 0; j < fixtureCreate; j++) {
             let local = fixtureCreate[j].visitante;
             let visitante = fixtureCreate[j].local;
-            let fixture = {
+            let fixtureRondas = {
               fecha: fecha,
-              partido: partido,
               local: local,
               visitante: visitante,
               torneo_id: torneo_id,
               fecha_desde: fecha_desde,
               fecha_hasta: fecha_hasta,
             };
-            fixtureCreate.push(fixture);
+
+            fixtureCreate.push(fixtureRondas);
+            console.log("fixtureCreate Finaliza ADD", fixtureCreate);
           }
         }
       }
     }
 
-    /*   for (let i = 0; i < numeroFechas; i++) {
-      const fecha = i + 1;
-      for (let j = 0; j < numeroPartidosFecha; j++) {
-
-        const equipo_local = await equipo.findOne({
-          where: {
-            id: equiposLocal[j]?.id,
-          },
-          attributes: ["id", "nombre"],
-        });
-
-        const equipo_visitante = await equipo.findOne({
-          where: {
-            id: equiposVisitante[j]?.id,
-          },
-          attributes: ["id", "nombre"],
-        });
-
-        const equipo_local_id = equipo_local?.id;
-        const equipo_visitante_id = equipo_visitante?.id;
-
-        fixtureCreate.push({
-          num_fecha: fecha,
-          equipo_local,
-          equipo_visitante,
-          torneo_id,
-          fecha_desde,
-          fecha_hasta
-        });
-
-        fixtureCreado.push({
-          num_fecha: fecha,
-          equipo_local : equipo_local_id,
-          equipo_visitante: equipo_visitante_id,
-          torneo_id,
-        });
-      }
-      //rotar equipos
-      equiposLocal.unshift(equiposLocal.pop());
-      equiposVisitante.unshift(equiposVisitante.pop());
-      equiposVisitante.unshift(equiposVisitante.pop());
-      //invierto localia
-    } */
-
-    /* 
+    
     let fixtureGroup= {
-      fecha: [
-      ],
+      fecha: [],
     }
     for (let i = 0; i < numeroFechas; i++) {
       let fecha = i + 1;
@@ -280,9 +177,9 @@ const createItems = async (req, res) => {
         partido: fixtureCreate.filter((item) => item.num_fecha === fecha),
       });
      
-    } */
+    } 
 
-    return res.json({ status: 200, fixtureCreate });
+    return res.json({ status: 200, fixtureCreate,fixtureGroup });
   } catch (error) {
     httpError(res, error);
   }
