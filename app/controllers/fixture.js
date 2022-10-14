@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
 const clasificacion = require("../models").Clasificacion;
-const equipo = require("../models").Equipo;
+const equipoReal = require("../models").Equipo;
 const fixture = require("../models").Fixture;
 const torneo = require("../models").Torneo;
 const tipos = require("../models").TipoTorneo;
@@ -17,20 +17,13 @@ const createItems = async (req, res) => {
   try {
     const { equipos, torneo_id, fecha_desde, fecha_hasta, rondas } = req.body;
 
-   /*  const torneoSelect = await torneo.findOne({
+     const torneoSelect = await torneo.findOne({
       where: {
         id: torneo_id,
       },
       include: [{ all: true }],
-    }); */
-
-   
- //prueba sin base de datos
-    const torneoSelect = {
-      id: 1,
-      nombre: "Torneo de prueba",
-    };
-
+    }); 
+    //prueba sin base de datos
 
     if (!torneoSelect) {
       return res.json({ message: "Torneo no encontrado", status: 404 });
@@ -56,130 +49,149 @@ const createItems = async (req, res) => {
     console.log("Equipos Sorteados", equiposSorteados);
 
     let fixtureCreate = [];
-    let fixtureCreado = [];
+    let fixtureCreadoBack = [];
     let equiposfecha = [];
     let indiceLocal;
     let indiceVisitante;
     let local;
     let visitante;
+    let partido;
 
     //crear fixture por fecha
 
-    for (let i = 0; i < numeroFechas; i++) {
-      let fecha = i + 1;
 
-      equiposfecha = equiposfecha.concat(equipos);
-
-      console.log("Equipos concat equipos", equiposfecha);
-
+   for (let i = 0; i < numeroFechas; i++) {
       for (let j = 0; j < numeroPartidosFecha; j++) {
+        partido = j+1;
+        indiceLocal = j;
+        indiceVisitante = numeroEquipos - 1 - j;
 
-        let partido = j + 1;
+        local = equiposSorteados[indiceLocal].id;
+        visitante = equiposSorteados[indiceVisitante].id;
 
-        //indice random
-        console.log("Equipos Length", equiposfecha.length);
+        equipoLocal = await equipoReal.findOne({
+          where: {
+            id: local,
+          },
+          attributes: ["id", "nombre"],
+        });
 
-        //validar que no se repitan los equipos
-        if (equiposfecha.length == 2) {
-          indiceLocal = 0;
-          indiceVisitante = 1;
-        } else if (equiposfecha.length > 0) {
-          console.log(
-            "Equipos Lengt primer fecha else",
-            equiposfecha.length - 1
-          );
-          indiceLocal = Math.ceil(Math.random() * equiposfecha.length - 1);
-        }
+        equipoVisitante = await equipoReal.findOne({
+          where: {
+            id: visitante,
+          },
+          attributes: ["id", "nombre"],
+        });
 
-
-        //obtener equipos reales
-        local = equiposfecha[indiceLocal];
-
-        console.log("PARTIDO", partido);
-
-            //no pueden jugar los mismo partidos 
-            visitante = equiposfecha.find(
-              (item,index) => ((item != local) 
-              &&(
-                  fixtureCreate.filter((element) => {
-                    return (
-                      (element.local == local && element.visitante == item) ||
-                      (element.local == item && element.visitante == local)
-                    );
-                  }).length == 0
-              )
-              )
-            );
-
-            indiceVisitante = equiposfecha.findIndex((item)=> item == visitante)
-            
-        let fixturePartial = {
-          fecha: fecha,
-          partido: partido,
-          local: local,
-          visitante: visitante,
+        fixtureCreate.push({
+          num_fecha: i + 1,
+          partido,
           torneo_id: torneo_id,
+          equipo_local: equipoLocal,
+          equipo_visitante: equipoVisitante,
+          fecha_desde: fecha_desde,
+          fecha_hasta: fecha_hasta,
+        });
+      }
+
+      //rotar equipos
+      equiposSorteados.splice(1, 0, equiposSorteados.pop());
+    }
+
+    let fixtureRondas = [];
+    //RONDAS MAYORES A 1, invertir localia
+    if (rondas > 1) {
+
+      for (let k = 0; k < rondas - 1; k++) {
+
+      for (let i = 0; i < numeroFechas; i++) {
+
+       let fecha = i + 1 + numeroFechas * (k + 1);
+       let fechaAnterior = i+1 + numeroFechas * k; 
+       console.log("fecha", fecha);
+        console.log("fechaAnterior", fechaAnterior);
+
+        for (let j = 0; j < numeroPartidosFecha; j++) {
+
+          let partido = j + 1;
+
+          let fixturePartial = fixtureCreate.find(
+            (item) => item.num_fecha == fechaAnterior && item.partido == partido
+          );
+
+          let equipoLocal = await equipoReal.findOne({
+            where: {
+              id: fixturePartial.visitante,
+            },
+            attributes: ["id", "nombre"],
+          });
+
+         let equipoVisitante = await equipoReal.findOne({
+
+            where: {
+              id: fixturePartial.local,
+            },
+            attributes: ["id", "nombre"],
+          });
+
+          let fixturePartialInvertido = {
+            num_fecha: fecha,
+            partido: partido,
+            equipo_local: equipoLocal,
+            equipo_visitante: equipoVisitante,
+            torneo_id: torneo_id,
+            fecha_desde: fecha_desde,
+            fecha_hasta: fecha_hasta,
+          };
+
+          fixtureCreate.push(fixturePartialInvertido);
+        }
+      }
+      
+    }
+  }
+    
+    console.log("fixture Create", fixtureCreate);
+
+    let fixtureCreado = {
+      fecha: [],
+    };
+    
+    if(rondas>1){
+      numeroFechas = numeroFechas * rondas;
+    }
+
+   for (let i = 0;  i < numeroFechas ; i++) {
+    console.log("HOLA QUE TAL VIEJO COMO ESTAS ADENTRO DEL FOR");
+      let fecha = i + 1;
+      fixtureCreado.fecha.push({
+        num_fecha: fecha,
+        partido: fixtureCreate.filter((item) => item.num_fecha == fecha),
+      });
+      console.log("fixtureCreado for", fixtureCreado);
+    } 
+    console.log("fixture Creado", fixtureCreado);
+    //colocar ids de equipos en fixture
+    fixtureCreadoBack = fixtureCreate.map((item) => {
+        return {
+          num_fecha: item.num_fecha,
+          partido: item.partido,
+          torneo_id: torneo_id,
+          equipo_local: item.equipo_local.id,
+          equipo_visitante: item.equipo_visitante.id,
           fecha_desde: fecha_desde,
           fecha_hasta: fecha_hasta,
         };
-        fixtureCreate.push(fixturePartial);
+    });
 
-        //eliminar equipos de la lista filter
-        equiposfecha = equiposfecha.filter(
-          (item) => item != local && item != visitante
-        );
 
-        console.log("Equipos fecha splice", equiposfecha);
-        console.log("fecha", fecha);
 
-        console.log("fixtureCreate Finaliza", fixtureCreate);
-      }
 
-    }
 
-    //RONDAS MAYORES A 1
-    if (rondas > 1) {
-      //invierte equipos
-      console.log("RONDAS",rondas)
-      for (let k = 0; k < rondas - 1; k++) {
 
-        for (let i = 0; i < numeroFechas; i++) {
 
-          let fecha = i + 1 + numeroFechas * (k + 1);
 
-          for (let j = 0; j < fixtureCreate; j++) {
-            let local = fixtureCreate[j].visitante;
-            let visitante = fixtureCreate[j].local;
-            let fixtureRondas = {
-              fecha: fecha,
-              local: local,
-              visitante: visitante,
-              torneo_id: torneo_id,
-              fecha_desde: fecha_desde,
-              fecha_hasta: fecha_hasta,
-            };
-
-            fixtureCreate.push(fixtureRondas);
-            console.log("fixtureCreate Finaliza ADD", fixtureCreate);
-          }
-        }
-      }
-    }
-
-    
-    let fixtureGroup= {
-      fecha: [],
-    }
-    for (let i = 0; i < numeroFechas; i++) {
-      let fecha = i + 1;
-      fixtureGroup.fecha.push({
-        num_fecha: fecha,
-        partido: fixtureCreate.filter((item) => item.num_fecha === fecha),
-      });
-     
-    } 
-
-    return res.json({ status: 200, fixtureCreate,fixtureGroup });
+    return res.json({ status: 200, fixtureCreate, fixtureCreado,fixtureCreadoBack });
   } catch (error) {
     httpError(res, error);
   }
