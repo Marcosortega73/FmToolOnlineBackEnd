@@ -15,9 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'torneo_id',
       });
       Fixture.belongsTo(models.Equipo, {
+        as: 'local',
         foreignKey: 'equipo_local',
       });
       Fixture.belongsTo(models.Equipo, {
+        as: 'visitante',
         foreignKey: 'equipo_visitante',
       });
     

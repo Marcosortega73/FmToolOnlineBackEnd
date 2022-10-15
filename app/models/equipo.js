@@ -43,10 +43,12 @@ module.exports = (sequelize, DataTypes) => {
       });
       //equipo local
       Equipo.hasMany(models.Fixture, {
+        as: 'local',
         foreignKey: 'equipo_local',
       });
       //equipo visitante
       Equipo.hasMany(models.Fixture, {
+        as: 'visitante',
         foreignKey: 'equipo_visitante',
       });
       

@@ -3,14 +3,14 @@ const verifyToken = require('../middlewares/verifyToken');
 const router = express.Router();
 const {getItems,getItem,createItems,updateItems,deleteItems,confirmCretateFixture} = require('../controllers/fixture')
 
-router.get('/obtenerTorneos', getItems )
+router.get('/obtenerFixture', getItems )
 
 //prueba
 /* router.get('/get', ((req,res)=>{
     res.send('hola')
 }) ) */
 
-router.get('/:id', getItem)
+router.get('/fixtureByTorneo/:id', getItem)
 
 router.post('/crearFixture', createItems)
 

@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
+const fixture = require("../models").Fixture;
 const clasificacion = require("../models").Clasificacion;
 const equipo = require("../models").Equipo;
 const torneo = require("../models").Torneo;
@@ -15,7 +16,6 @@ const getItems = async (req, res) => {
         {
           model: continente,
         },
-
         {
           model: equipo,
           include: [
@@ -24,8 +24,18 @@ const getItems = async (req, res) => {
             },
           ],
         },
+     /*    {
+          model: fixture,
+          include: [
+            {
+              all: true,
+            },
+          ],
+        }, */
+
       ],
     });
+
     return res.json({ torneos, status: 200 });
   } catch (error) {
     httpError(res, error);
@@ -36,7 +46,7 @@ const getItemById = async (req, res) => {
   try {
     const getTorneo = await torneo.findOne({
       where: { id: req.params.id },
-      include: [{all: true}],
+      include: [{ all: true }],
     });
     return res.json({ getTorneo, status: 200 });
   } catch (error) {

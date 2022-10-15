@@ -8,9 +8,47 @@ const tipos = require("../models").TipoTorneo;
 const equipo_x_torneo = require("../models").equipo_x_torneo;
 //continente
 
-const getItems = async (req, res) => {};
+const getItems = async (req, res) => {
+  try {
+    console.log("HOLA FIXTURE GET DATA")
+    const fixtureData = await fixture.findAll({
+      include: [
+        {
+          model: equipoReal,
+          include: [
+            {
+              all: true,
+            },
+          ],
+        },
+      ],
+    });
 
-const getItem = async (req, res) => {};
+    return res.json({ fixture:fixtureData, status: 200 });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+const getItem = async (req, res) => {
+  try {
+    const getFixture = await fixture.findAll({
+      where: { torneo_id: req.params.id },
+      include: [
+        {
+          model: equipoReal, as: "local",
+        },
+        {
+          model: equipoReal, as: "visitante",
+        },
+
+      ],
+    });
+    return res.json({ getFixture, status: 200 });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
 
 const createItems = async (req, res) => {
   //sortear fixture
