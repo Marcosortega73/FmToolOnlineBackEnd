@@ -1,9 +1,10 @@
 {
+
   "development": {
-    "username": "root",
-    "password": "rock14°$$!",
-    "database": "fmonlinetoolsDev",
-    "host": "127.0.0.1",
+    "username": "mortega",
+    "password": "Abc1234$",
+    "database": "testfm",
+    "host": "localhost",
     "dialect": "mysql"
   },
   "test": {
@@ -25,6 +26,13 @@
     "password": "50c5042f",
     "database": "heroku_a38bc8b481e60ce",
     "host": "us-cdbr-east-06.cleardb.net",
+    "dialect": "mysql"
+  },
+  "remote": {
+    "username": "mortega",
+    "password": "Abc1234$",
+    "database": "testfm",
+    "host": "localhost",
     "dialect": "mysql"
   }
 }

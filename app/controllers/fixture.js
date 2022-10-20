@@ -5,6 +5,7 @@ const equipoReal = require("../models").Equipo;
 const fixture = require("../models").Fixture;
 const torneo = require("../models").Torneo;
 const tipos = require("../models").TipoTorneo;
+const equipos = require("../models").Equipo;
 const equipo_x_torneo = require("../models").equipo_x_torneo;
 //continente
 
@@ -260,11 +261,15 @@ const createItems = async (req, res) => {
 const confirmCretateFixture = async (req, res) => {
   try {
     const { fixtureCreado, torneo_id } = req.body;
-    console.log(
-      "=>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",
-      fixtureCreado
-    );
+
+
     const getFixture = await fixture.findOne({
+      where: {
+        torneo_id: torneo_id,
+      },
+    });
+
+    const getEquiposByTorneo = await equipo_x_torneo.findAll({
       where: {
         torneo_id: torneo_id,
       },
@@ -277,6 +282,23 @@ const confirmCretateFixture = async (req, res) => {
       });
     }
     const fixtureCreate = await fixture.bulkCreate(fixtureCreado);
+
+    await getEquiposByTorneo.map(async (item) => {
+
+      await clasificacion.create({
+        equipo_id: item.equipo_id,
+        torneo_id: item.torneo_id,
+        puntos: 0,
+        partidos_jugados: 0,
+        partidos_ganados: 0,
+        partidos_empatados: 0,
+        partidos_perdidos: 0,
+        goles_favor: 0,
+        goles_contra: 0,
+        diferencia_goles: 0,
+      });
+    });
+
     return res.json({ fixtureCreate, status: 200 });
   } catch (error) {
     httpError(res, error);
@@ -312,7 +334,7 @@ const updateItems = async (req, res) => {
       }
     );
 
-    if (field == "goles_local" && fixtureUpdated.goles_visitante == null) {
+/*     if (field == "goles_local" && fixtureUpdated.goles_visitante == null) {
       console.log("GOLES LOCALLLL COLAALLLSS");
       await fixture.update(
         {
@@ -324,9 +346,9 @@ const updateItems = async (req, res) => {
           },
         }
       );
-    }
+    } */
 
-    if (field == "goles_visitante" && fixtureUpdated.goles_local == null) {
+ /*    if (field == "goles_visitante" && fixtureUpdated.goles_local == null) {
       console.log("GOLES VISITANTEEE COLAALLLSS");
       await fixture.update(
         {
@@ -338,7 +360,7 @@ const updateItems = async (req, res) => {
           },
         }
       );
-    }
+    } */
 
     const fixtureEstado = await fixture.findOne({
       where: {
@@ -349,7 +371,7 @@ const updateItems = async (req, res) => {
     if (fixtureEstado.estado == null) {
       await fixture.update(
         {
-          estado: "Jugado",
+          estado: "Jugando",
         },
         {
           where: {
@@ -359,6 +381,20 @@ const updateItems = async (req, res) => {
       );
     }
 
+    if (fixtureEstado.goles_local && fixtureEstado.goles_visitante != null) {
+      await fixture.update(
+        {
+          estado: "Terminado",
+        },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+    }
+
+
     const partidoCompleto = await fixture.findOne({
       where: {
         id,
@@ -366,56 +402,179 @@ const updateItems = async (req, res) => {
     });
 
     //ACTUALIZAR TABLA POSICIONES
-    if (
-      partidoCompleto.estado == "Jugado"
-    ) {
-
-      const equipoLocal = await equipo.findOne({
+    if (partidoCompleto.estado == "Terminado") {
+     /*  const equipoLocal = await equipos.findOne({
         where: {
           id: partidoCompleto.equipo_local,
         },
       });
 
-      const equipoVisitante = await equipo.findOne({
+      const equipoVisitante = await equipos.findOne({
         where: {
           id: partidoCompleto.equipo_visitante,
         },
-      });
+      }); */
 
       //id, partidos_jugados, partidos_ganados, partidos_empatados, partidos_perdidos, goles_favor, goles_contra, diferencia_goles, puntos, equipo_id, torneo_id, createdAt, updatedAt
       const equipoXclasificacionLocal = await clasificacion.findOne({
         where: {
-          equipo_id: equipoLocal.id,
+          equipo_id: partidoCompleto.equipo_local,
           torneo_id: partidoCompleto.torneo_id,
         },
       });
+
+      console.log("equipoXclasificacionLocal", equipoXclasificacionLocal);
 
       const equipoXclasificacionVisitante = await clasificacion.findOne({
         where: {
-          equipo_id: equipoVisitante.id,
+          equipo_id: partidoCompleto.equipo_visitante,
           torneo_id: partidoCompleto.torneo_id,
         },
       });
 
+      console.log("equipoXclasificacionVisitante", equipoXclasificacionVisitante);
+
       //ACTUALIZAR PARTIDOS JUGADOS
-      await clasificacion.update(
-        {
-          partidos_jugados: equipoXclasificacionLocal.partidos_jugados + 1,
 
-        },
-        {
-          where: {
-            id: equipoXclasificacionLocal.id,
+      const ganador =
+        partidoCompleto.goles_local > partidoCompleto.goles_visitante
+          ? partidoCompleto.equipo_local
+          : partidoCompleto.goles_local > partidoCompleto.goles_visitante
+          ? partidoCompleto.equipo_visitante
+          : "empate";
+
+
+
+        const goles_favor = equipoXclasificacionLocal.goles_favor +
+        partidoCompleto.goles_local;
+        const goles_contra = equipoXclasificacionLocal.goles_contra +
+        partidoCompleto.goles_visitante;
+        const diferenciaGolesLocal = goles_favor - goles_contra;
+
+        const goles_favorVisitante = equipoXclasificacionVisitante.goles_favor +
+        partidoCompleto.goles_visitante;
+        const goles_contraVisitante = equipoXclasificacionVisitante.goles_contra +
+        partidoCompleto.goles_local;
+        const diferenciaGolesVisitante = goles_favorVisitante - goles_contraVisitante;
+
+
+      if (ganador == partidoCompleto.equipo_local) {
+
+        await clasificacion.update(
+          {
+            partidos_jugados: equipoXclasificacionLocal.partidos_jugados + 1,
+            partidos_ganados: equipoXclasificacionLocal.partidos_ganados + 1,
+            goles_favor:goles_favor,
+            goles_contra: goles_contra,
+            diferencia_goles:diferenciaGolesLocal,
+            puntos: equipoXclasificacionLocal.puntos + 3,
           },
+          {
+            where: {
+              id: equipoXclasificacionLocal.id,
+              torneo_id: partidoCompleto.torneo_id,
+            },
+          }
+        );
 
-        }
-      );
-    }
+        await clasificacion.update(
+          {
+            partidos_jugados: equipoXclasificacionVisitante.partidos_jugados + 1,
+            partidos_perdidos: equipoXclasificacionVisitante.partidos_perdidos + 1,
+            goles_favor:goles_favorVisitante,
+            goles_contra: goles_contraVisitante,
+            diferencia_goles:diferenciaGolesVisitante,
+          },
+          {
+            where: {
+              id: equipoXclasificacionVisitante.id,
+              torneo_id: partidoCompleto.torneo_id,
+            },
+          }
+        );
+
+      } else if (ganador == partidoCompleto.equipo_visitante) {
+        await clasificacion.update(
+          {
+            partidos_jugados:
+              equipoXclasificacionVisitante.partidos_jugados + 1,
+            partidos_ganados:
+              equipoXclasificacionVisitante.partidos_ganados + 1,
+            goles_favor:
+              goles_favorVisitante,
+            goles_contra:
+            goles_contraVisitante,
+            diferencia_goles:
+            diferenciaGolesVisitante,
+            puntos: equipoXclasificacionVisitante.puntos + 3,
+          },
+          {
+            where: {
+              id: equipoXclasificacionVisitante.id,
+              torneo_id: partidoCompleto.torneo_id,
+            },
+          }
+        );
+
+        await clasificacion.update(
+          {
+            partidos_jugados: equipoXclasificacionLocal.partidos_jugados + 1,
+            partidos_perdidos: equipoXclasificacionLocal.partidos_perdidos + 1,
+            goles_favor:goles_favor,
+            goles_contra: goles_contra,
+            diferencia_goles:diferenciaGolesLocal,
+          },
+          {
+            where: {
+              id: equipoXclasificacionLocal.id,
+              torneo_id: partidoCompleto.torneo_id,
+            },
+          }
+        );
         
+      } else if (ganador == "empate") {
 
+        console.log("EMPATEEE");
+        await clasificacion.update(
+          {
+            partidos_jugados:
+              equipoXclasificacionVisitante.partidos_jugados + 1,
+            partidos_empatados:
+              equipoXclasificacionVisitante.partidos_empatados + 1,
+            goles_favor:
+            goles_favorVisitante,
+            goles_contra:
+            goles_contraVisitante,
+            puntos: equipoXclasificacionVisitante.puntos + 1,
+          },
+          {
+            where: {
+              id: equipoXclasificacionVisitante.id,
+              torneo_id: partidoCompleto.torneo_id,
+            },
+          }
+        );
 
-
-
+        await clasificacion.update(
+          {
+            partidos_jugados: equipoXclasificacionLocal.partidos_jugados + 1,
+            partidos_empatados:
+              equipoXclasificacionLocal.partidos_empatados + 1,
+            goles_favor:
+            goles_favor,
+            goles_contra:
+              goles_contra,
+            puntos: equipoXclasificacionLocal.puntos + 1,
+          },
+          {
+            where: {
+              id: equipoXclasificacionLocal.id,
+              torneo_id: partidoCompleto.torneo_id,
+            },
+          }
+        );
+      }
+    }
 
     return res.json({
       status: 200,
