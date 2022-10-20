@@ -10,21 +10,50 @@ const equipo_x_torneo = require("../models").equipo_x_torneo;
 
 const getItems = async (req, res) => {
   try {
-    console.log("HOLA FIXTURE GET DATA")
+    console.log("HOLA FIXTURE GET DATA");
     const fixtureData = await fixture.findAll({
       include: [
         {
           model: equipoReal,
-          include: [
-            {
-              all: true,
-            },
-          ],
+          as: "local",
+        },
+        {
+          model: equipoReal,
+          as: "visitante",
+        },
+        {
+          model: torneo,
         },
       ],
     });
 
-    return res.json({ fixture:fixtureData, status: 200 });
+    return res.json({ fixture: fixtureData, status: 200 });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+const getItemsFilter = async (req, res) => {
+  const { fecha = 1 } = req.query;
+  try {
+    console.log("HOLA FIXTURE GET DATA");
+
+    const fixtureData = await fixture.findAndCountAll({
+      include: [
+        {
+          model: equipoReal,
+          as: "local",
+        },
+        {
+          model: equipoReal,
+          as: "visitante",
+        },
+      ],
+      where: { torneo_id: req.params.id },
+      where: { num_fecha: fecha },
+    });
+
+    return res.json({ fixture: fixtureData, status: 200 });
   } catch (error) {
     httpError(res, error);
   }
@@ -36,12 +65,13 @@ const getItem = async (req, res) => {
       where: { torneo_id: req.params.id },
       include: [
         {
-          model: equipoReal, as: "local",
+          model: equipoReal,
+          as: "local",
         },
         {
-          model: equipoReal, as: "visitante",
+          model: equipoReal,
+          as: "visitante",
         },
-
       ],
     });
     return res.json({ getFixture, status: 200 });
@@ -55,12 +85,12 @@ const createItems = async (req, res) => {
   try {
     const { equipos, torneo_id, fecha_desde, fecha_hasta, rondas } = req.body;
 
-     const torneoSelect = await torneo.findOne({
+    const torneoSelect = await torneo.findOne({
       where: {
         id: torneo_id,
       },
       include: [{ all: true }],
-    }); 
+    });
     //prueba sin base de datos
 
     if (!torneoSelect) {
@@ -97,10 +127,9 @@ const createItems = async (req, res) => {
 
     //crear fixture por fecha
 
-
-   for (let i = 0; i < numeroFechas; i++) {
+    for (let i = 0; i < numeroFechas; i++) {
       for (let j = 0; j < numeroPartidosFecha; j++) {
-        partido = j+1;
+        partido = j + 1;
         indiceLocal = j;
         indiceVisitante = numeroEquipos - 1 - j;
 
@@ -139,97 +168,90 @@ const createItems = async (req, res) => {
     let fixtureRondas = [];
     //RONDAS MAYORES A 1, invertir localia
     if (rondas > 1) {
-
       for (let k = 0; k < rondas - 1; k++) {
+        for (let i = 0; i < numeroFechas; i++) {
+          let fecha = i + 1 + numeroFechas * (k + 1);
+          let fechaAnterior = i + 1 + numeroFechas * k;
+          console.log("fecha", fecha);
+          console.log("fechaAnterior", fechaAnterior);
 
-      for (let i = 0; i < numeroFechas; i++) {
+          for (let j = 0; j < numeroPartidosFecha; j++) {
+            let partido = j + 1;
 
-       let fecha = i + 1 + numeroFechas * (k + 1);
-       let fechaAnterior = i+1 + numeroFechas * k; 
-       console.log("fecha", fecha);
-        console.log("fechaAnterior", fechaAnterior);
+            let fixturePartial = fixtureCreate.find(
+              (item) =>
+                item.num_fecha == fechaAnterior && item.partido == partido
+            );
 
-        for (let j = 0; j < numeroPartidosFecha; j++) {
+            let equipoLocal = await equipoReal.findOne({
+              where: {
+                id: fixturePartial.visitante,
+              },
+              attributes: ["id", "nombre"],
+            });
 
-          let partido = j + 1;
+            let equipoVisitante = await equipoReal.findOne({
+              where: {
+                id: fixturePartial.local,
+              },
+              attributes: ["id", "nombre"],
+            });
 
-          let fixturePartial = fixtureCreate.find(
-            (item) => item.num_fecha == fechaAnterior && item.partido == partido
-          );
+            let fixturePartialInvertido = {
+              num_fecha: fecha,
+              partido: partido,
+              equipo_local: equipoLocal,
+              equipo_visitante: equipoVisitante,
+              torneo_id: torneo_id,
+              fecha_desde: fecha_desde,
+              fecha_hasta: fecha_hasta,
+            };
 
-          let equipoLocal = await equipoReal.findOne({
-            where: {
-              id: fixturePartial.visitante,
-            },
-            attributes: ["id", "nombre"],
-          });
-
-         let equipoVisitante = await equipoReal.findOne({
-
-            where: {
-              id: fixturePartial.local,
-            },
-            attributes: ["id", "nombre"],
-          });
-
-          let fixturePartialInvertido = {
-            num_fecha: fecha,
-            partido: partido,
-            equipo_local: equipoLocal,
-            equipo_visitante: equipoVisitante,
-            torneo_id: torneo_id,
-            fecha_desde: fecha_desde,
-            fecha_hasta: fecha_hasta,
-          };
-
-          fixtureCreate.push(fixturePartialInvertido);
+            fixtureCreate.push(fixturePartialInvertido);
+          }
         }
       }
-      
     }
-  }
-    
+
     console.log("fixture Create", fixtureCreate);
 
     let fixtureCreado = {
       fecha: [],
     };
-    
-    if(rondas>1){
+
+    if (rondas > 1) {
       numeroFechas = numeroFechas * rondas;
     }
 
-   for (let i = 0;  i < numeroFechas ; i++) {
-    console.log("HOLA QUE TAL VIEJO COMO ESTAS ADENTRO DEL FOR");
+    for (let i = 0; i < numeroFechas; i++) {
+      console.log("HOLA QUE TAL VIEJO COMO ESTAS ADENTRO DEL FOR");
       let fecha = i + 1;
       fixtureCreado.fecha.push({
         num_fecha: fecha,
         partido: fixtureCreate.filter((item) => item.num_fecha == fecha),
       });
       console.log("fixtureCreado for", fixtureCreado);
-    } 
+    }
     console.log("fixture Creado", fixtureCreado);
     //colocar ids de equipos en fixture
     fixtureCreadoBack = fixtureCreate.map((item) => {
-        return {
-          num_fecha: item.num_fecha,
-          partido: item.partido,
-          torneo_id: torneo_id,
-          equipo_local: item.equipo_local.id,
-          equipo_visitante: item.equipo_visitante.id,
-          fecha_desde: fecha_desde,
-          fecha_hasta: fecha_hasta,
-        };
+      return {
+        num_fecha: item.num_fecha,
+        partido: item.partido,
+        torneo_id: torneo_id,
+        equipo_local: item.equipo_local.id,
+        equipo_visitante: item.equipo_visitante.id,
+        fecha_desde: fecha_desde,
+        fecha_hasta: fecha_hasta,
+      };
     });
 
-
-
-
-
-
-
-
-    return res.json({ status: 200, fixtureCreate, fixtureCreado,fixtureCreadoBack });
+    return res.json({
+      status: 200,
+      fixtureCreate,
+      fixtureCreado,
+      fixtureCreadoBack,
+    });
   } catch (error) {
     httpError(res, error);
   }
@@ -261,7 +283,149 @@ const confirmCretateFixture = async (req, res) => {
   }
 };
 
-const updateItems = (req, res) => {};
+const updateItems = async (req, res) => {
+  try {
+    const { id, field, value } = req.body;
+    //validar value que sea numero
+
+    if (typeof value !== "number") {
+      return res.json({
+        message: "El valor ingresado no es un numero",
+        status: 400,
+      });
+    }
+
+    const fixtureUpdated = await fixture.findOne({
+      where: {
+        id,
+      },
+    });
+
+    await fixture.update(
+      {
+        [field]: value,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+
+    if (field == "goles_local" && fixtureUpdated.goles_visitante == null) {
+      console.log("GOLES LOCALLLL COLAALLLSS");
+      await fixture.update(
+        {
+          goles_visitante: 0,
+        },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+    }
+
+    if (field == "goles_visitante" && fixtureUpdated.goles_local == null) {
+      console.log("GOLES VISITANTEEE COLAALLLSS");
+      await fixture.update(
+        {
+          goles_local: 0,
+        },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+    }
+
+    const fixtureEstado = await fixture.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (fixtureEstado.estado == null) {
+      await fixture.update(
+        {
+          estado: "Jugado",
+        },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+    }
+
+    const partidoCompleto = await fixture.findOne({
+      where: {
+        id,
+      },
+    });
+
+    //ACTUALIZAR TABLA POSICIONES
+    if (
+      partidoCompleto.estado == "Jugado"
+    ) {
+
+      const equipoLocal = await equipo.findOne({
+        where: {
+          id: partidoCompleto.equipo_local,
+        },
+      });
+
+      const equipoVisitante = await equipo.findOne({
+        where: {
+          id: partidoCompleto.equipo_visitante,
+        },
+      });
+
+      //id, partidos_jugados, partidos_ganados, partidos_empatados, partidos_perdidos, goles_favor, goles_contra, diferencia_goles, puntos, equipo_id, torneo_id, createdAt, updatedAt
+      const equipoXclasificacionLocal = await clasificacion.findOne({
+        where: {
+          equipo_id: equipoLocal.id,
+          torneo_id: partidoCompleto.torneo_id,
+        },
+      });
+
+      const equipoXclasificacionVisitante = await clasificacion.findOne({
+        where: {
+          equipo_id: equipoVisitante.id,
+          torneo_id: partidoCompleto.torneo_id,
+        },
+      });
+
+      //ACTUALIZAR PARTIDOS JUGADOS
+      await clasificacion.update(
+        {
+          partidos_jugados: equipoXclasificacionLocal.partidos_jugados + 1,
+
+        },
+        {
+          where: {
+            id: equipoXclasificacionLocal.id,
+          },
+
+        }
+      );
+    }
+        
+
+
+
+
+
+    return res.json({
+      status: 200,
+      partidoCompleto,
+      message: "Partido actualizado correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
 const deleteItems = (req, res) => {};
 
 module.exports = {
@@ -271,4 +435,5 @@ module.exports = {
   updateItems,
   deleteItems,
   confirmCretateFixture,
+  getItemsFilter,
 };

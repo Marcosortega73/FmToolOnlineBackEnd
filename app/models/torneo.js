@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
       Torneo.hasMany(models.Fixture, {
         foreignKey: 'torneo_id',
       });
+      //tipo
+      Torneo.belongsTo(models.TipoTorneo, {
+        foreignKey: 'tipo_id',
+      });
   
     }
 

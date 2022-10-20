@@ -7,6 +7,7 @@ const torneo = require("../models").Torneo;
 const tipos = require("../models").TipoTorneo;
 const continente = require("../models").Continente;
 const equipo_x_torneo = require("../models").equipo_x_torneo;
+const temporada = require("../models").Season;
 //continente
 
 const getItems = async (req, res) => {
@@ -24,14 +25,13 @@ const getItems = async (req, res) => {
             },
           ],
         },
-     /*    {
-          model: fixture,
-          include: [
-            {
-              all: true,
-            },
-          ],
-        }, */
+        {
+          model: tipos,
+        },
+        {
+          model: temporada,
+        },
+
 
       ],
     });
