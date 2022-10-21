@@ -300,7 +300,7 @@ const confirmCretateFixture = async (req, res) => {
     });
 
     //asignar posicion por abc
-    await clasificacion
+   const statsCLa= await clasificacion
       .findAll({
         include: [
           {
@@ -313,13 +313,13 @@ const confirmCretateFixture = async (req, res) => {
         },
         order: [[equipos, "nombre", "ASC"]],
       })
-      .then(async (clasificacion) => {
+      .then(async (stats) => {
         let posicion = 1;
-        for (let i = 0; i < clasificacion.length; i++) {
-          await clasificacion[i].update({
+        for (let i = 0; i < statsCLa.length; i++) {
+          await stats[i].update({
             posicion: posicion,
           });
-          posicion++;
+          posicion+=1;
         }
       });
 

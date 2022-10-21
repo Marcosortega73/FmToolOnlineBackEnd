@@ -74,6 +74,32 @@ const updateItems = async (req, res) => {
   }
 };
 
+const equiposxnacion = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const equiposByNation = await equipos.findAll({
+      where: { nacionalidad_id: id, torneo_id: 1 },
+      include: [
+        {
+          model: nacionalidad,
+        },
+        {
+          model: torneo,
+        }
+      ],
+    });
+    res.json({
+      clubes:equiposByNation,
+      status: 200,
+    });
+  } catch (e) {
+    httpError(res, e);
+  }
+};
+
+
+
 
 
 const deleteItems = async (req, res) => {
