@@ -2,11 +2,11 @@
 
   "development": {
     "username": "root",
-    "password": "rock14°$$!",
-    "database": "fmonlinetoolsDev",
-    "host": "127.0.0.1",
+    "password": "Abc1234$",
+    "database": "fmonlinetoolsdev",
+    "host": "localhost",
     "dialect": "mysql"
-  }, 
+  },
   "test": {
     "username": "root",
     "password": null,

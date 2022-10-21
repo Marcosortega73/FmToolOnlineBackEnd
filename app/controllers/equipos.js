@@ -74,37 +74,7 @@ const updateItems = async (req, res) => {
   }
 };
 
-const equiposxnacion = async (req, res) => {
-  try {
-    const { id } = req.params;
 
-    const equiposByNation = await equipos.findAll({
-      where: { nacionalidad_id: id },
-      include: [
-        {
-          model: nacionalidad,
-        },
-      ],
-    });
-
-     
-/*    if (equiposRegion?.Nacionalidads?.Equipos.length === 0) {
-      return res.json({
-        message: "No se encontraron equipos",
-        status: 404,
-      });
-    } */
-
-
-
-    res.json({
-      clubes:equiposByNation,
-      status: 200,
-    });
-  } catch (e) {
-    httpError(res, e);
-  }
-};
 
 const deleteItems = async (req, res) => {
   try {
@@ -134,4 +104,11 @@ const deleteItems = async (req, res) => {
   }
 };
 
-module.exports = { getItems, getItem, createItems, updateItems, deleteItems,equiposxnacion };
+module.exports = {
+  getItems,
+  getItem,
+  createItems,
+  updateItems,
+  deleteItems,
+  equiposxnacion,
+};
