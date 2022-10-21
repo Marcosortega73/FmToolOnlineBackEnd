@@ -9,6 +9,25 @@ const config = require(__dirname + "/../../config/config.json")[env];
 
 const db = {};
 
+//database dev local
+/* "development": {
+  "username": "root",
+  "password": "rock14°$$!",
+  "database": "fmonlinetoolsDev",
+  "host": "127.0.0.1",
+  "dialect": "mysql"
+}, 
+
+//database dev remote
+"development": {
+    "username": "root",
+    "password": "Abc1234$",
+    "database": "fmonlinetoolsdev",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+*/
+
 let sequelize;
 
 if (config.use_env_variable) {

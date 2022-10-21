@@ -1,12 +1,12 @@
 {
 
   "development": {
-    "username": "mortega",
-    "password": "Abc1234$",
-    "database": "testfm",
-    "host": "localhost",
+    "username": "root",
+    "password": "rock14°$$!",
+    "database": "fmonlinetoolsDev",
+    "host": "127.0.0.1",
     "dialect": "mysql"
-  },
+  }, 
   "test": {
     "username": "root",
     "password": null,

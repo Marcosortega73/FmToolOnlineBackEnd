@@ -8,6 +8,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      posicion: {
+        type: Sequelize.INTEGER
+      },
       partidos_jugados: {
         type: Sequelize.INTEGER
       },

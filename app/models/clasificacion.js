@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Clasificacion.init({
+    posicion: DataTypes.INTEGER,
     partidos_jugados: DataTypes.INTEGER,
     partidos_ganados: DataTypes.INTEGER,
     partidos_empatados: DataTypes.INTEGER,

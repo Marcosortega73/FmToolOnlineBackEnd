@@ -28,6 +28,8 @@ const getItems = async (req, res) => {
       ],
     });
 
+    //buscar por torneo
+
     return res.json({ fixture: fixtureData, status: 200 });
   } catch (error) {
     httpError(res, error);
@@ -262,7 +264,6 @@ const confirmCretateFixture = async (req, res) => {
   try {
     const { fixtureCreado, torneo_id } = req.body;
 
-
     const getFixture = await fixture.findOne({
       where: {
         torneo_id: torneo_id,
@@ -284,7 +285,6 @@ const confirmCretateFixture = async (req, res) => {
     const fixtureCreate = await fixture.bulkCreate(fixtureCreado);
 
     await getEquiposByTorneo.map(async (item) => {
-
       await clasificacion.create({
         equipo_id: item.equipo_id,
         torneo_id: item.torneo_id,
@@ -298,6 +298,30 @@ const confirmCretateFixture = async (req, res) => {
         diferencia_goles: 0,
       });
     });
+
+    //asignar posicion por abc
+    await clasificacion
+      .findAll({
+        include: [
+          {
+            model: equipos,
+            attributes: ["nombre"],
+          },
+        ],
+        where: {
+          torneo_id: torneo_id,
+        },
+        order: [[equipos, "nombre", "ASC"]],
+      })
+      .then(async (clasificacion) => {
+        let posicion = 1;
+        for (let i = 0; i < clasificacion.length; i++) {
+          await clasificacion[i].update({
+            posicion: posicion,
+          });
+          posicion++;
+        }
+      });
 
     return res.json({ fixtureCreate, status: 200 });
   } catch (error) {
@@ -334,7 +358,7 @@ const updateItems = async (req, res) => {
       }
     );
 
-/*     if (field == "goles_local" && fixtureUpdated.goles_visitante == null) {
+    /*     if (field == "goles_local" && fixtureUpdated.goles_visitante == null) {
       console.log("GOLES LOCALLLL COLAALLLSS");
       await fixture.update(
         {
@@ -348,7 +372,7 @@ const updateItems = async (req, res) => {
       );
     } */
 
- /*    if (field == "goles_visitante" && fixtureUpdated.goles_local == null) {
+    /*    if (field == "goles_visitante" && fixtureUpdated.goles_local == null) {
       console.log("GOLES VISITANTEEE COLAALLLSS");
       await fixture.update(
         {
@@ -394,7 +418,6 @@ const updateItems = async (req, res) => {
       );
     }
 
-
     const partidoCompleto = await fixture.findOne({
       where: {
         id,
@@ -403,7 +426,7 @@ const updateItems = async (req, res) => {
 
     //ACTUALIZAR TABLA POSICIONES
     if (partidoCompleto.estado == "Terminado") {
-     /*  const equipoLocal = await equipos.findOne({
+      /*  const equipoLocal = await equipos.findOne({
         where: {
           id: partidoCompleto.equipo_local,
         },
@@ -432,7 +455,10 @@ const updateItems = async (req, res) => {
         },
       });
 
-      console.log("equipoXclasificacionVisitante", equipoXclasificacionVisitante);
+      console.log(
+        "equipoXclasificacionVisitante",
+        equipoXclasificacionVisitante
+      );
 
       //ACTUALIZAR PARTIDOS JUGADOS
 
@@ -443,30 +469,30 @@ const updateItems = async (req, res) => {
           ? partidoCompleto.equipo_visitante
           : "empate";
 
-
-
-        const goles_favor = equipoXclasificacionLocal.goles_favor +
-        partidoCompleto.goles_local;
-        const goles_contra = equipoXclasificacionLocal.goles_contra +
+      const goles_favor =
+        equipoXclasificacionLocal.goles_favor + partidoCompleto.goles_local;
+      const goles_contra =
+        equipoXclasificacionLocal.goles_contra +
         partidoCompleto.goles_visitante;
-        const diferenciaGolesLocal = goles_favor - goles_contra;
+      const diferenciaGolesLocal = goles_favor - goles_contra;
 
-        const goles_favorVisitante = equipoXclasificacionVisitante.goles_favor +
+      const goles_favorVisitante =
+        equipoXclasificacionVisitante.goles_favor +
         partidoCompleto.goles_visitante;
-        const goles_contraVisitante = equipoXclasificacionVisitante.goles_contra +
+      const goles_contraVisitante =
+        equipoXclasificacionVisitante.goles_contra +
         partidoCompleto.goles_local;
-        const diferenciaGolesVisitante = goles_favorVisitante - goles_contraVisitante;
-
+      const diferenciaGolesVisitante =
+        goles_favorVisitante - goles_contraVisitante;
 
       if (ganador == partidoCompleto.equipo_local) {
-
         await clasificacion.update(
           {
             partidos_jugados: equipoXclasificacionLocal.partidos_jugados + 1,
             partidos_ganados: equipoXclasificacionLocal.partidos_ganados + 1,
-            goles_favor:goles_favor,
+            goles_favor: goles_favor,
             goles_contra: goles_contra,
-            diferencia_goles:diferenciaGolesLocal,
+            diferencia_goles: diferenciaGolesLocal,
             puntos: equipoXclasificacionLocal.puntos + 3,
           },
           {
@@ -479,11 +505,13 @@ const updateItems = async (req, res) => {
 
         await clasificacion.update(
           {
-            partidos_jugados: equipoXclasificacionVisitante.partidos_jugados + 1,
-            partidos_perdidos: equipoXclasificacionVisitante.partidos_perdidos + 1,
-            goles_favor:goles_favorVisitante,
+            partidos_jugados:
+              equipoXclasificacionVisitante.partidos_jugados + 1,
+            partidos_perdidos:
+              equipoXclasificacionVisitante.partidos_perdidos + 1,
+            goles_favor: goles_favorVisitante,
             goles_contra: goles_contraVisitante,
-            diferencia_goles:diferenciaGolesVisitante,
+            diferencia_goles: diferenciaGolesVisitante,
           },
           {
             where: {
@@ -492,7 +520,6 @@ const updateItems = async (req, res) => {
             },
           }
         );
-
       } else if (ganador == partidoCompleto.equipo_visitante) {
         await clasificacion.update(
           {
@@ -500,12 +527,9 @@ const updateItems = async (req, res) => {
               equipoXclasificacionVisitante.partidos_jugados + 1,
             partidos_ganados:
               equipoXclasificacionVisitante.partidos_ganados + 1,
-            goles_favor:
-              goles_favorVisitante,
-            goles_contra:
-            goles_contraVisitante,
-            diferencia_goles:
-            diferenciaGolesVisitante,
+            goles_favor: goles_favorVisitante,
+            goles_contra: goles_contraVisitante,
+            diferencia_goles: diferenciaGolesVisitante,
             puntos: equipoXclasificacionVisitante.puntos + 3,
           },
           {
@@ -520,9 +544,9 @@ const updateItems = async (req, res) => {
           {
             partidos_jugados: equipoXclasificacionLocal.partidos_jugados + 1,
             partidos_perdidos: equipoXclasificacionLocal.partidos_perdidos + 1,
-            goles_favor:goles_favor,
+            goles_favor: goles_favor,
             goles_contra: goles_contra,
-            diferencia_goles:diferenciaGolesLocal,
+            diferencia_goles: diferenciaGolesLocal,
           },
           {
             where: {
@@ -531,9 +555,7 @@ const updateItems = async (req, res) => {
             },
           }
         );
-        
       } else if (ganador == "empate") {
-
         console.log("EMPATEEE");
         await clasificacion.update(
           {
@@ -541,10 +563,8 @@ const updateItems = async (req, res) => {
               equipoXclasificacionVisitante.partidos_jugados + 1,
             partidos_empatados:
               equipoXclasificacionVisitante.partidos_empatados + 1,
-            goles_favor:
-            goles_favorVisitante,
-            goles_contra:
-            goles_contraVisitante,
+            goles_favor: goles_favorVisitante,
+            goles_contra: goles_contraVisitante,
             puntos: equipoXclasificacionVisitante.puntos + 1,
           },
           {
@@ -560,10 +580,8 @@ const updateItems = async (req, res) => {
             partidos_jugados: equipoXclasificacionLocal.partidos_jugados + 1,
             partidos_empatados:
               equipoXclasificacionLocal.partidos_empatados + 1,
-            goles_favor:
-            goles_favor,
-            goles_contra:
-              goles_contra,
+            goles_favor: goles_favor,
+            goles_contra: goles_contra,
             puntos: equipoXclasificacionLocal.puntos + 1,
           },
           {
@@ -574,6 +592,31 @@ const updateItems = async (req, res) => {
           }
         );
       }
+    }
+
+    //actualizar posicion de la tabla
+    const clasificacionXtorneo = await clasificacion.findAll({
+      where: {
+        torneo_id: partidoCompleto.torneo_id,
+      },
+      order: [
+        ["puntos", "DESC"],
+        ["diferencia_goles", "DESC"],
+        ["goles_favor", "DESC"],
+      ],
+    });
+
+    for (let i = 0; i < clasificacionXtorneo.length; i++) {
+      await clasificacion.update(
+        {
+          posicion: i + 1,
+        },
+        {
+          where: {
+            id: clasificacionXtorneo[i].id,
+          },
+        }
+      );
     }
 
     return res.json({
