@@ -43,6 +43,8 @@ const getItemsbyRegion = async (req, res) => {
           },
         ],
         order: [["nombre", "ASC"]],
+      /*   offset: 0,
+        limit: 1000, */
       })
       .then((data) => {
         const clubes = data.filter((item) => {

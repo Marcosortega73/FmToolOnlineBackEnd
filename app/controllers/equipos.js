@@ -5,17 +5,50 @@ const continente = require("../models").Continente;
 const equipos = require("../models").Equipo;
 const nacionalidad = require("../models").Nacionalidad;
 const manager = require("../models").Manager;
+const { Op } = require("sequelize");
 
 const getItems = async (req, res) => {
   try {
+    const {
+      pagina = 0,
+      search = "",
+      cantidadItems = 10,
+      field = "nombre",
+      order = "asc",
+    } = req.query;
+
+    const offset = pagina * cantidadItems;
+    const limit = parseInt(cantidadItems);
+    const searchString = `%${search}%`;
+    console.log("LLEGANDO A querySort", field);
+
     const clubes = await equipos.findAll({
       include: [
         {
           all: true,
         },
       ],
+    }); /* .then((data) => {
+      //ordenar y paginar
+      const querySort = data.sort((a, b) => {
+        if (a[field] > b[field]) {
+          return 1;
+        }
+        if (a[field] < b[field]) {
+          return -1;
+        }
+        return 0;
+      });
+      const queryPaginate = querySort.slice(offset, offset + limit);
+      return queryPaginate;
     });
-    return res.json({ clubes, status: 200 });
+
+    res.json({
+      ok: true,
+      clubes,
+    }); */
+
+    return res.json({ clubes });
   } catch (error) {
     httpError(res, error);
   }
@@ -86,21 +119,17 @@ const equiposxnacion = async (req, res) => {
         },
         {
           model: torneo,
-        }
+        },
       ],
     });
     res.json({
-      clubes:equiposByNation,
+      clubes: equiposByNation,
       status: 200,
     });
   } catch (e) {
     httpError(res, e);
   }
 };
-
-
-
-
 
 const deleteItems = async (req, res) => {
   try {

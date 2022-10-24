@@ -15,6 +15,10 @@ module.exports = {
       nombre: {
         type: Sequelize.STRING
       },
+      nombre_corto: {
+        type: Sequelize.STRING ,
+        allowNull: true,
+      },
       nacionalidad_id: {
         type: Sequelize.INTEGER,
         references: {

@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       Equipo.belongsTo(models.Nacionalidad, {
         foreignKey: 'nacionalidad_id',
+        as: 'Nacionalidad',
       });
       //relacion ocn manager 1 a 1
       Equipo.hasOne(models.Manager, {
@@ -59,6 +60,7 @@ module.exports = (sequelize, DataTypes) => {
   Equipo.init({
     idFmrte: DataTypes.INTEGER,
     nombre: DataTypes.STRING,
+    nombre_corto:DataTypes.STRING,
     nacionalidad_id: DataTypes.INTEGER,
   /*   torneo_id: DataTypes.INTEGER, */
   }, {

@@ -12,6 +12,9 @@ router.post('/createEquipo',verifyToken, createItems)
 //continente_id
 router.get('/equiposxnacion/:id', equiposxnacion)
 
+//equiposSearch
+router.get('/equiposSearch/:search', getItems)
+
 
 router.put('/:id', updateItems)
 

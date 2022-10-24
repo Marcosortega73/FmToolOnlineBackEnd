@@ -127,6 +127,7 @@ const createEquiposBase = async (req, res) => {
       return {
         idFmrte: equipo.idFmrte ? equipo.idFmrte : null,
         nombre: equipo.nombre,
+        nombre_corto: equipo.nombre_corto ? equipo.nombre_corto : null,
         nacionalidad_id: equipo.nacionalidad_id,
         id: equipo.id,
         torneo_id: equipo.torneo_id ? equipo.torneo_id : null,
