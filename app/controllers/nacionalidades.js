@@ -20,7 +20,9 @@ const getItemsbyRegion = async (req, res) => {
   try {
 
     const {season} = req.query;
+
     const nations = await nacionalidad.findAll({
+      
       where: { continente_id: req.params.id },
       include: [
         {

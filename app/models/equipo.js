@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
       });
       Equipo.belongsTo(models.Nacionalidad, {
         foreignKey: 'nacionalidad_id',
-        as: 'Nacionalidad',
       });
       //relacion ocn manager 1 a 1
       Equipo.hasOne(models.Manager, {

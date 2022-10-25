@@ -300,7 +300,7 @@ const confirmCretateFixture = async (req, res) => {
     });
 
     //asignar posicion por abc
-   const statsCLa= await clasificacion
+   const statsCLa = await clasificacion
       .findAll({
         include: [
           {
@@ -312,16 +312,20 @@ const confirmCretateFixture = async (req, res) => {
           torneo_id: torneo_id,
         },
         order: [[equipos, "nombre", "ASC"]],
-      })
-      .then(async (stats) => {
-        let posicion = 1;
-        for (let i = 0; i < statsCLa.length; i++) {
-          await stats[i].update({
-            posicion: posicion,
-          });
-          posicion+=1;
-        }
       });
+
+    statsCLa.map(async (item, index) => {
+      await clasificacion.update(
+        {
+          posicion: index + 1,
+        },
+        {
+          where: {
+            id: item.id,
+          },
+        }
+      );
+    });
 
     return res.json({ fixtureCreate, status: 200 });
   } catch (error) {
@@ -357,34 +361,6 @@ const updateItems = async (req, res) => {
         },
       }
     );
-
-    /*     if (field == "goles_local" && fixtureUpdated.goles_visitante == null) {
-      console.log("GOLES LOCALLLL COLAALLLSS");
-      await fixture.update(
-        {
-          goles_visitante: 0,
-        },
-        {
-          where: {
-            id,
-          },
-        }
-      );
-    } */
-
-    /*    if (field == "goles_visitante" && fixtureUpdated.goles_local == null) {
-      console.log("GOLES VISITANTEEE COLAALLLSS");
-      await fixture.update(
-        {
-          goles_local: 0,
-        },
-        {
-          where: {
-            id,
-          },
-        }
-      );
-    } */
 
     const fixtureEstado = await fixture.findOne({
       where: {
@@ -426,19 +402,7 @@ const updateItems = async (req, res) => {
 
     //ACTUALIZAR TABLA POSICIONES
     if (partidoCompleto.estado == "Terminado") {
-      /*  const equipoLocal = await equipos.findOne({
-        where: {
-          id: partidoCompleto.equipo_local,
-        },
-      });
 
-      const equipoVisitante = await equipos.findOne({
-        where: {
-          id: partidoCompleto.equipo_visitante,
-        },
-      }); */
-
-      //id, partidos_jugados, partidos_ganados, partidos_empatados, partidos_perdidos, goles_favor, goles_contra, diferencia_goles, puntos, equipo_id, torneo_id, createdAt, updatedAt
       const equipoXclasificacionLocal = await clasificacion.findOne({
         where: {
           equipo_id: partidoCompleto.equipo_local,
@@ -469,6 +433,9 @@ const updateItems = async (req, res) => {
           ? partidoCompleto.equipo_visitante
           : "empate";
 
+      console.log("ganadorfixtureUpdatedfixtureUpdatedfixtureUpdatedfixtureUpdatedfixtureUpdated", fixtureUpdated);
+      console.log("ganador", ganador);3
+      console.log("PARTIDO COMPLETOCOMPLETOCOMPLETOCOMPLETOCOMPLETOCOMPLETO", partidoCompleto);
       const goles_favor =
         equipoXclasificacionLocal.goles_favor + partidoCompleto.goles_local;
       const goles_contra =

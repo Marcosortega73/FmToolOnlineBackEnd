@@ -6,6 +6,7 @@ const equipos = require("../models").Equipo;
 const nacionalidad = require("../models").Nacionalidad;
 const manager = require("../models").Manager;
 const { Op } = require("sequelize");
+const torneo = require("../models").Torneo;
 
 const getItems = async (req, res) => {
   try {
@@ -110,9 +111,21 @@ const updateItems = async (req, res) => {
 const equiposxnacion = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("natiooooooooooooooooooooooooo", id);
+    const {season_id=null} = req.query;
 
-    const equiposByNation = await equipos.findAll({
-      where: { nacionalidad_id: id, torneo_id: 1 },
+    if(!season_id){
+      return res.json({
+        message: "No se ha enviado la season_id",
+        status: 404,
+      });
+    }
+
+  if(season_id){
+
+    const equiposByNation = await equipos
+    .findAll({
+      where: { nacionalidad_id: id },
       include: [
         {
           model: nacionalidad,
@@ -121,11 +134,40 @@ const equiposxnacion = async (req, res) => {
           model: torneo,
         },
       ],
+      order: [["nombre", "ASC"]],
+    /*   offset: 0,
+      limit: 1000, */
+    })
+    .then((data) => {
+      const clubes = data.filter((item) => {
+        //filtrar equipos que no pertenezcan a un torneo o que pertenezcan a un torneo pero que no sean de la season actual
+        if (item.Torneos.length == 0) {
+          return item;
+        }
+
+        if (item.Torneos.length > 0) {
+         
+          const torneo = item.Torneos.filter((item) => {
+            if (item.season_id !=  season_id ) {
+              return item;
+            }
+            else if ( item.tipo_id !== 1 ) //enviar el tipo de torneo actual
+            {
+              return item;
+            }
+          });
+          console.log("TORNEOOOOOOOOOOOOOOOOOOOOOO TORNEOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO x nacion",torneo);
+          return torneo.length > 0 ? item : null;
+        }
+      });
+      return clubes;
     });
     res.json({
       clubes: equiposByNation,
       status: 200,
     });
+  }   
+
   } catch (e) {
     httpError(res, e);
   }
