@@ -53,6 +53,10 @@ module.exports = {
       grupo: {
         type: Sequelize.STRING,
       },
+      ganador: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
     });
   },
   async down(queryInterface, Sequelize) {

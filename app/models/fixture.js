@@ -37,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     fecha_hasta: DataTypes.DATE,
     estado: DataTypes.STRING,
     grupo: DataTypes.STRING,
+    ganador: DataTypes.STRING,
 
 
   }, {
