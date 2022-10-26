@@ -493,7 +493,7 @@ const updateItems = async (req, res) => {
           partidoCompleto.goles_visitante;
         const diferenciaGolesLocal = goles_favor - goles_contra;
 
-        const ganadosLocal =
+        /*       const ganadosLocal =
           equipoXclasificacionLocal.partidos_ganados > 0
             ? equipoXclasificacionLocal.partidos_ganados - 1
             : 0;
@@ -504,7 +504,7 @@ const updateItems = async (req, res) => {
         const empatadosLocal =
           equipoXclasificacionLocal.partidos_empatados > 0
             ? equipoXclasificacionLocal.partidos_empatados - 1
-            : 0;
+            : 0; */
 
         // #datos del visitante
         const goles_favorVisitante =
@@ -518,23 +518,17 @@ const updateItems = async (req, res) => {
         const diferenciaGolesVisitante =
           goles_favorVisitante - goles_contraVisitante;
 
-        const ganadosVisitante =
-          equipoXclasificacionVisitante.partidos_ganados > 0
-            ? equipoXclasificacionVisitante.partidos_ganados - 1
-            : 0;
-        const perdidosVisitante =
-          equipoXclasificacionVisitante.partidos_perdidos > 0
-            ? equipoXclasificacionVisitante.partidos_perdidos - 1
-            : 0;
-        const empatadosVisitante =
-          equipoXclasificacionVisitante.partidos_empatados > 0
-            ? equipoXclasificacionVisitante.partidos_empatados - 1
-            : 0;
+        let puntosLocal = 0;
+        let puntosVisitante = 0;
+        let ganadosLocal = equipoXclasificacionLocal.partidos_ganados;
+        let perdidosLocal = equipoXclasificacionLocal.partidos_perdidos;
+        let empatadosLocal = equipoXclasificacionLocal.partidos_empatados;
+        let ganadosVisitante = equipoXclasificacionVisitante.partidos_ganados;
+        let perdidosVisitante = equipoXclasificacionVisitante.partidos_perdidos;
+        let empatadosVisitante =
+          equipoXclasificacionVisitante.partidos_empatados;
 
         if (ganador == partidoCompleto.equipo_local) {
-          let puntosLocal = 0;
-          let puntosVisitante = 0;
-
           // #Actualizar clasificacion local los puntos
           switch (fixtureUpdated.ganador) {
             case "local":
@@ -544,10 +538,19 @@ const updateItems = async (req, res) => {
             case "visitante":
               puntosLocal = 3;
               puntosVisitante = -3;
+              ganadosLocal++;
+              perdidosLocal--;
+              perdidosVisitante++;
+              ganadosVisitante--;
               break;
             case "empate":
               puntosLocal = 2;
               puntosVisitante = -1;
+              ganadosLocal ++;
+              empatadosVisitante --;
+              empatadosLocal --;
+              perdidosVisitante ++;
+
               break;
             default:
               puntosLocal = 0;
@@ -557,9 +560,9 @@ const updateItems = async (req, res) => {
 
           await clasificacion.update(
             {
-              partidos_ganados: ganadosLocal + 1,
-              partidos_empatados: empatadosLocal,
-              partidos_perdidos: perdidosLocal,
+              partidos_ganados: ganadosLocal > 0 ? ganadosLocal : 0,
+              partidos_empatados: empatadosLocal > 0 ? empatadosLocal : 0,
+              partidos_perdidos: perdidosLocal > 0 ? perdidosLocal : 0,
               goles_favor: goles_favor,
               goles_contra: goles_contra,
               diferencia_goles: diferenciaGolesLocal,
@@ -578,9 +581,10 @@ const updateItems = async (req, res) => {
               goles_favor: goles_favorVisitante,
               goles_contra: goles_contraVisitante,
               diferencia_goles: diferenciaGolesVisitante,
-              partidos_ganados: ganadosVisitante,
-              partidos_empatados: empatadosVisitante,
-              partidos_perdidos: perdidosVisitante + 1,
+              partidos_ganados: ganadosVisitante > 0 ? ganadosVisitante : 0,
+              partidos_empatados:
+                empatadosVisitante > 0 ? empatadosVisitante : 0,
+              partidos_perdidos: perdidosVisitante > 0 ? perdidosVisitante : 0,
               puntos: equipoXclasificacionVisitante.puntos + puntosVisitante,
             },
             {
@@ -593,12 +597,14 @@ const updateItems = async (req, res) => {
         }
 
         if (ganador == partidoCompleto.equipo_visitante) {
-          let puntosLocal = 0;
-          let puntosVisitante = 0;
           switch (fixtureUpdated.ganador) {
             case "local":
               puntosLocal = -3;
               puntosVisitante = 3;
+              ganadosVisitante++;
+              perdidosVisitante--;
+              perdidosLocal++;
+              ganadosLocal--;
               break;
             case "visitante":
               puntosLocal = 0;
@@ -607,6 +613,10 @@ const updateItems = async (req, res) => {
             case "empate":
               puntosLocal = -1;
               puntosVisitante = 2;
+              ganadosVisitante++;
+              empatadosVisitante--;
+              empatadosLocal--;
+              perdidosLocal++;
               break;
             default:
               puntosLocal = 0;
@@ -619,9 +629,10 @@ const updateItems = async (req, res) => {
               goles_favor: goles_favorVisitante,
               goles_contra: goles_contraVisitante,
               diferencia_goles: diferenciaGolesVisitante,
-              partidos_ganados: ganadosVisitante + 1,
-              partidos_empatados: empatadosVisitante,
-              partidos_perdidos: perdidosVisitante,
+              partidos_ganados: ganadosVisitante > 0 ? ganadosVisitante : 0,
+              partidos_empatados:
+                empatadosVisitante > 0 ? empatadosVisitante : 0,
+              partidos_perdidos: perdidosVisitante > 0 ? perdidosVisitante : 0,
               puntos: equipoXclasificacionVisitante.puntos + puntosVisitante,
             },
             {
@@ -637,9 +648,9 @@ const updateItems = async (req, res) => {
               goles_favor: goles_favor,
               goles_contra: goles_contra,
               diferencia_goles: diferenciaGolesLocal,
-              partidos_ganados: ganadosLocal,
-              partidos_empatados: empatadosLocal,
-              partidos_perdidos: perdidosLocal + 1,
+              partidos_ganados: ganadosLocal > 0 ? ganadosLocal : 0,
+              partidos_empatados: empatadosLocal > 0 ? empatadosLocal : 0,
+              partidos_perdidos: perdidosLocal > 0 ? perdidosLocal : 0,
               puntos: equipoXclasificacionLocal.puntos + puntosLocal,
             },
             {
@@ -650,16 +661,25 @@ const updateItems = async (req, res) => {
             }
           );
         } else if (ganador == "empate") {
-          let puntosLocal = 0;
-          let puntosVisitante = 0;
+          console.log(
+            "EMPATADOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO EDIIIIITTTTTTTTTTTTTTTTTTTTT"
+          );
           switch (fixtureUpdated.ganador) {
             case "local":
               puntosLocal = -2;
               puntosVisitante = 1;
+              ganadosLocal--;
+              empatadosLocal++;
+              empatadosVisitante++;
+              perdidosVisitante--;
               break;
             case "visitante":
               puntosLocal = 1;
               puntosLocal = -2;
+              ganadosVisitante--;
+              empatadosVisitante++;
+              empatadosLocal++;
+              perdidosLocal--;
               break;
             case "empate":
               puntosLocal = 0;
@@ -676,9 +696,10 @@ const updateItems = async (req, res) => {
               goles_favor: goles_favorVisitante,
               goles_contra: goles_contraVisitante,
               diferencia_goles: diferenciaGolesVisitante,
-              partidos_ganados: ganadosVisitante,
-              partidos_empatados: empatadosVisitante + 1,
-              partidos_perdidos: perdidosVisitante,
+              partidos_ganados: ganadosVisitante > 0 ? ganadosVisitante : 0,
+              partidos_empatados:
+                empatadosVisitante > 0 ? empatadosVisitante : 0,
+              partidos_perdidos: perdidosVisitante > 0 ? perdidosVisitante : 0,
               puntos: equipoXclasificacionVisitante.puntos + puntosVisitante,
             },
             {
@@ -694,9 +715,9 @@ const updateItems = async (req, res) => {
               goles_favor: goles_favor,
               goles_contra: goles_contra,
               diferencia_goles: diferenciaGolesLocal,
-              partidos_ganados: ganadosLocal,
-              partidos_empatados: empatadosLocal + 1,
-              partidos_perdidos: perdidosLocal,
+              partidos_ganados: ganadosLocal > 0 ? ganadosLocal : 0,
+              partidos_empatados: empatadosLocal > 0 ? empatadosLocal : 0,
+              partidos_perdidos: perdidosLocal > 0 ? perdidosLocal : 0,
               puntos: equipoXclasificacionLocal.puntos + puntosLocal,
             },
             {
