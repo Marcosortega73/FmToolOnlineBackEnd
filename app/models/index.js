@@ -22,7 +22,7 @@ const db = {};
 "development": {
     "username": "root",
     "password": "Abc1234$",
-    "database": "fmonlinetoolsdev",
+    "database": "testfm",
     "host": "localhost",
     "dialect": "mysql"
   },

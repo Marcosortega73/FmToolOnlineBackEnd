@@ -5,13 +5,7 @@ const estadistica = require("../models").Estadistica;
 
 const getItems = async (req, res) => {
   try {
-    const estadisticas = await estadistica.findAll({
-      include: [
-        {
-       all: true,
-        },
-      ],
-    } );
+    const estadisticas = await estadistica.findAll();
     return res.json({ estadisticas, status: 200 });
   } catch (error) {
     httpError(res, error);
@@ -42,7 +36,28 @@ const getItem = async (req, res) => {};
 
 
 
+
+
 }; */
+
+//obtener goleadores por torneo
+const getGoleadoresByTorneo = async (req, res) => {
+  try {
+    const estadisticas = await estadisticasbypartidoss.findAll({
+      where: { torneo_id: req.params.id },
+      include: [
+        {
+          model: estadistica,
+          where: { id: 1 },
+        },
+      ],
+    });
+    return res.json({ estadisticas, status: 200 });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
 const updateItems = (req, res) => {};
 const deleteItems = (req, res) => {};
 
