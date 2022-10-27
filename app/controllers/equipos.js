@@ -7,6 +7,7 @@ const nacionalidad = require("../models").Nacionalidad;
 const manager = require("../models").Manager;
 const { Op } = require("sequelize");
 const torneo = require("../models").Torneo;
+const jugadores = require("../models").Jugador;
 
 const getItems = async (req, res) => {
   try {
@@ -26,8 +27,16 @@ const getItems = async (req, res) => {
     const clubes = await equipos.findAll({
       include: [
         {
-          all: true,
+          model: nacionalidad,
         },
+        {
+          model: torneo,
+        },
+        {
+          model:jugadores,
+          atributtes:['id','nombre']
+        }
+
       ],
     }); /* .then((data) => {
       //ordenar y paginar

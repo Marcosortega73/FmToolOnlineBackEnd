@@ -29,6 +29,12 @@ module.exports = (sequelize, DataTypes) => {
       Jugador.hasMany(models.Season, {
         foreignKey: 'jugador_asistente_id',
       });
+      
+      Jugador.belongsToMany(models.Estadistica, {
+        through: "estadisticasbypartidos",
+        foreignKey: "jugador_id",
+        timestamps: false,
+      });
     }
   }
   Jugador.init(

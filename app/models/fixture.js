@@ -22,6 +22,15 @@ module.exports = (sequelize, DataTypes) => {
         as: 'visitante',
         foreignKey: 'equipo_visitante',
       });
+      Fixture.belongsToMany(models.Estadistica, {
+        through: 'estadisticasbypartidos',
+        foreignKey: 'partido_id',
+        timestamps : false,
+      });
+
+
+    
+
     
 
     }

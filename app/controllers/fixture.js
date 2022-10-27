@@ -7,6 +7,7 @@ const torneo = require("../models").Torneo;
 const tipos = require("../models").TipoTorneo;
 const equipos = require("../models").Equipo;
 const equipo_x_torneo = require("../models").equipo_x_torneo;
+const jugadores = require("../models").Jugador;
 //continente
 
 const getItems = async (req, res) => {
@@ -17,10 +18,22 @@ const getItems = async (req, res) => {
         {
           model: equipoReal,
           as: "local",
+          include: [
+            {
+              model:jugadores,
+              atributtes:['id','nombre']
+            }
+          ]
         },
         {
           model: equipoReal,
           as: "visitante",
+          include: [
+            {
+              model:jugadores,
+              atributtes:['id','nombre']
+            }
+          ]
         },
         {
           model: torneo,
@@ -46,10 +59,22 @@ const getItemsFilter = async (req, res) => {
         {
           model: equipoReal,
           as: "local",
+          include: [
+            {
+              model:jugadores,
+              atributtes:['id','nombre']
+            }
+          ]
+              
         },
         {
           model: equipoReal,
           as: "visitante",
+          include: [
+            {
+              model:jugadores
+            }
+          ]
         },
       ],
       where: { torneo_id: req.params.id },

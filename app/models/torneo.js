@@ -36,6 +36,12 @@ module.exports = (sequelize, DataTypes) => {
       Torneo.belongsTo(models.TipoTorneo, {
         foreignKey: 'tipo_id',
       });
+      //estadistica
+      Torneo.belongsToMany(models.Estadistica, {
+        through: 'estadisticasbypartidos',
+        foreignKey: 'torneo_id',
+        timestamps : false,
+      });
   
     }
 
