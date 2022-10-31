@@ -2,6 +2,7 @@ const Sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
 const estadisticasbypartidoss = require("../models").EstadisticasByPartido;
 const estadistica = require("../models").Estadistica;
+const jugador = require("../models").Jugador;
 
 const getItems = async (req, res) => {
   try {
@@ -50,6 +51,10 @@ const getGoleadoresByTorneo = async (req, res) => {
           model: estadistica,
           where: { id: 1 },
         },
+          {
+            model: jugador,
+          },
+          
       ],
     });
     return res.json({ estadisticas, status: 200 });
@@ -58,7 +63,30 @@ const getGoleadoresByTorneo = async (req, res) => {
   }
 };
 
+//createItems
+const createItems = async (req, res) => {
+  try {
+    const { jugadores } = req.body;
+
+    console.log("jugadoreseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", jugadores);
+    jugadores[0].forEach(async (jugador) => {
+      await estadisticasbypartidoss.create({
+      partido_id:jugador.partido_id,
+      estadistica_id:jugador.estadistica_id,
+      jugador_id:jugador.jugador.id,
+      torneo_id:jugador.torneo_id,
+      cantidad:jugador.cantidad,
+    });
+  });
+
+    return res.json({ status: 200, message: "Estadisticas creadas correctamente" });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+
 const updateItems = (req, res) => {};
 const deleteItems = (req, res) => {};
 
-module.exports = { getItems, getItem, updateItems, deleteItems };
+module.exports = { getItems, getItem, updateItems, deleteItems,createItems,getGoleadoresByTorneo};
