@@ -214,6 +214,76 @@ const cargarLesionRoja = async (req, res) => {
   }
 };
 
+const cargarGoleadores = async (req, res) => {
+  try {
+    const { goleadores, idPartido, idTorneo, estadistica_id } = req.body;
+
+    const existeStats = await estadisticasbypartidoss.findOne({
+      where: { partido_id: idPartido },
+    });
+
+    if (existeStats) {
+      return res.json({
+        status: 400,
+        message: "Ya se cargaron las estadisticas",
+      });
+    }
+    console.log("jugadores", goleadores,"asddddddddddddddddddddddddddddd");
+    goleadores.forEach(async (jugador) => {
+      if (jugador.goles > 0) {
+        await estadisticasbypartidoss.create({
+          partido_id: idPartido,
+          estadistica_id,
+          jugador_id: jugador.jugador_id,
+          torneo_id: idTorneo,
+          cantidad: jugador.goles,
+        });
+      }
+    });
+    return res.json({
+      status: 200,
+      message: "Estadisticas creadas correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+const cargarAsistencias = async (req, res) => {
+  try {
+    const { asistencias, idPartido, idTorneo, estadistica_id } = req.body;
+
+    const existeStats = await estadisticasbypartidoss.findOne({
+      where: { partido_id: idPartido },
+    });
+
+    if (existeStats) {
+      return res.json({
+        status: 400,
+        message: "Ya se cargaron las estadisticas",
+      });
+    }
+
+    asistencias.forEach(async (jugador) => {
+      if (jugador.asistencias > 0) {
+        await estadisticasbypartidoss.create({
+          partido_id: idPartido,
+          estadistica_id,
+          jugador_id: jugador.jugador_id,
+          torneo_id: idTorneo,
+          cantidad: jugador.asistencias,
+        });
+      }
+    });
+    return res.json({
+      status: 200,
+      message: "Estadisticas creadas correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
 const updateItems = (req, res) => {};
 const deleteItems = (req, res) => {};
 
@@ -228,4 +298,6 @@ module.exports = {
   cargarLesionNaranja,
   cargarLesionRoja,
   cargarMvp,
+  cargarGoleadores,
+  cargarAsistencias,
 };
