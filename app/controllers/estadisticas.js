@@ -51,10 +51,9 @@ const getGoleadoresByTorneo = async (req, res) => {
           model: estadistica,
           where: { id: 1 },
         },
-          {
-            model: jugador,
-          },
-          
+        {
+          model: jugador,
+        },
       ],
     });
     return res.json({ estadisticas, status: 200 });
@@ -64,29 +63,169 @@ const getGoleadoresByTorneo = async (req, res) => {
 };
 
 //createItems
-const createItems = async (req, res) => {
+const cargarRojas = async (req, res) => {
   try {
-
-    console.log("jugadoreseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", req.body);
-    const {jugadores,partido,torneo} = req.body;
-
-    jugadores.forEach(async (jugador) => {
+    console.log(
+      "jugadoreseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      req.body.roja
+    );
+    const { roja, idPartido, idTorneo, estadistica_id } = req.body;
+    roja.forEach(async (jugador) => {
       await estadisticasbypartidoss.create({
-      partido_id:jugador.partido_id,
-      estadistica_id:3,
-      jugador_id:jugador.jugador.id,
-      torneo_id:jugador.torneo_id,
+        partido_id: idPartido,
+        estadistica_id,
+        jugador_id: jugador.id,
+        torneo_id: idTorneo,
+      });
     });
-  }); 
 
-    return res.json({ status: 200, message: "Estadisticas creadas correctamente" });
+    return res.json({
+      status: 200,
+      message: "Estadisticas creadas correctamente",
+    });
   } catch (error) {
     httpError(res, error);
   }
 };
 
+const cargarAmarillas = async (req, res) => {
+  try {
+    console.log(
+      "jugadoreseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      req.body.amarilla
+    );
+    const { amarilla, idPartido, idTorneo, estadistica_id } = req.body;
+    const existeStats = await estadisticasbypartidoss.findOne({
+      where: { partido_id: idPartido },
+    });
+
+    if (existeStats) {
+      return res.json({
+        status: 400,
+        message: "Ya se cargaron las estadisticas",
+      });
+    }
+    amarilla.forEach(async (jugador) => {
+      await estadisticasbypartidoss.create({
+        partido_id: idPartido,
+        estadistica_id,
+        jugador_id: jugador.id,
+        torneo_id: idTorneo,
+      });
+    });
+    return res.json({
+      status: 200,
+      message: "Estadisticas creadas correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+const cargarMvp = async (req, res) => {
+  try {
+    const { mvp, idPartido, idTorneo, estadistica_id } = req.body;
+
+    const existeStats = await estadisticasbypartidoss.findOne({
+      where: { partido_id: idPartido },
+    });
+
+    if (existeStats) {
+      return res.json({
+        status: 400,
+        message: "Ya se cargaron las estadisticas",
+      });
+    }
+    await estadisticasbypartidoss.create({
+      partido_id: idPartido,
+      estadistica_id,
+      jugador_id: mvp.id,
+      torneo_id: idTorneo,
+    });
+    return res.json({
+      status: 200,
+      message: "Estadisticas creadas correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+const cargarLesionNaranja = async (req, res) => {
+  try {
+    const { lesionados, idPartido, idTorneo, estadistica_id } = req.body;
+
+    const existeStats = await estadisticasbypartidoss.findOne({
+      where: { partido_id: idPartido },
+    });
+
+    if (existeStats) {
+      return res.json({
+        status: 400,
+        message: "Ya se cargaron las estadisticas",
+      });
+    }
+    lesionados.forEach(async (jugador) => {
+      await estadisticasbypartidoss.create({
+        partido_id: idPartido,
+        estadistica_id,
+        jugador_id: jugador.id,
+        torneo_id: idTorneo,
+      });
+    });
+    return res.json({
+      status: 200,
+      message: "Estadisticas creadas correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+const cargarLesionRoja = async (req, res) => {
+  try {
+    const { lesionados, idPartido, idTorneo, estadistica_id } = req.body;
+
+    const existeStats = await estadisticasbypartidoss.findOne({
+      where: { partido_id: idPartido },
+    });
+
+    if (existeStats) {
+      return res.json({
+        status: 400,
+        message: "Ya se cargaron las estadisticas",
+      });
+    }
+
+    lesionados.forEach(async (jugador) => {
+      await estadisticasbypartidoss.create({
+        partido_id: idPartido,
+        estadistica_id,
+        jugador_id: jugador.id,
+        torneo_id: idTorneo,
+      });
+    });
+    return res.json({
+      status: 200,
+      message: "Estadisticas creadas correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
 
 const updateItems = (req, res) => {};
 const deleteItems = (req, res) => {};
 
-module.exports = { getItems, getItem, updateItems, deleteItems,createItems,getGoleadoresByTorneo};
+module.exports = {
+  getItems,
+  getItem,
+  updateItems,
+  deleteItems,
+  cargarRojas,
+  getGoleadoresByTorneo,
+  cargarAmarillas,
+  cargarLesionNaranja,
+  cargarLesionRoja,
+  cargarMvp,
+};
