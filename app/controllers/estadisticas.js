@@ -245,7 +245,7 @@ const cargarLesionRoja = async (req, res) => {
       lesionados.forEach(async (jugador) => {
         existeStats.forEach(async (stat) => {
           if (stat.jugador_id !== jugador.id) {
-            await estadisticasbypartidoss.delete(
+            await estadisticasbypartidoss.destroy(
               { where: { id: stat.id } }
             );
           }

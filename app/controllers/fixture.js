@@ -87,6 +87,32 @@ const getItemsFilter = async (req, res) => {
   }
 };
 
+const getItemsFilterView = async (req, res) => {
+  const { fecha = 1 } = req.query;
+  try {
+    console.log("HOLA FIXTURE GET DATA");
+
+    const fixtureData = await fixture.findAndCountAll({
+      include: [
+        {
+          model: equipoReal,
+          as: "local",   
+        },
+        {
+          model: equipoReal,
+          as: "visitante",
+        },
+      ],
+      where: { torneo_id: req.params.id },
+      where: { num_fecha: fecha },
+    });
+
+    return res.json({ fixture: fixtureData, status: 200 });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
 const getItem = async (req, res) => {
   try {
     const getFixture = await fixture.findAll({
@@ -955,4 +981,5 @@ module.exports = {
   deleteItems,
   confirmCretateFixture,
   getItemsFilter,
+  getItemsFilterView,
 };

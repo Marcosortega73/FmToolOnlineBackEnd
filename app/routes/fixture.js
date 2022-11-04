@@ -1,7 +1,7 @@
 const express = require('express');
 const verifyToken = require('../middlewares/verifyToken');
 const router = express.Router();
-const {getItems,getItem,createItems,updateItems,deleteItems,confirmCretateFixture,getItemsFilter} = require('../controllers/fixture')
+const {getItems,getItem,getItemsFilterView,createItems,updateItems,deleteItems,confirmCretateFixture,getItemsFilter} = require('../controllers/fixture')
 
 router.get('/obtenerFixture', getItems )
 
@@ -13,6 +13,7 @@ router.get('/obtenerFixture', getItems )
 router.get('/fixtureByTorneo/:id', getItem)
 
 router.get('/filtros/:id', getItemsFilter )
+router.get('/filtrosView/:id', getItemsFilterView )
 
 router.post('/crearFixture', createItems)
 
