@@ -3,6 +3,7 @@ const { httpError } = require("../helpers/handleError");
 const estadisticasbypartidoss = require("../models").EstadisticasByPartido;
 const estadistica = require("../models").Estadistica;
 const jugador = require("../models").Jugador;
+const equipo = require("../models").Equipo;
 
 const getItems = async (req, res) => {
   try {
@@ -53,10 +54,42 @@ const getGoleadoresByTorneo = async (req, res) => {
         },
         {
           model: jugador,
+          attributes: ["nombre"],
+          include: [
+            {
+              model:equipo,
+              attributes: ["nombre_corto"]
+            }
+          ]
         },
       ],
+    }).then((data) => {
+      const goleadores = data.map((goleador) => {
+        return {
+          id: goleador.jugador_id,
+          nombre: goleador?.Jugador?.nombre,
+          equipo: goleador?.Jugador?.Equipo.nombre_corto,
+          goles: goleador.cantidad,
+        };
+      });
+
+      //sumar goles
+      const goleadoresFiltrados = goleadores.reduce((acc, goleador) => {
+        const existe = acc.find((g) => g.id === goleador.id);
+        if (existe) {
+          existe.goles += goleador.goles;
+        } else {
+          acc.push(goleador);
+        }
+        return acc;
+      }, []);
+
+
+      return goleadoresFiltrados;
+
     });
     return res.json({ estadisticas, status: 200 });
+    
   } catch (error) {
     httpError(res, error);
   }

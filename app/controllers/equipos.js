@@ -34,7 +34,7 @@ const getItems = async (req, res) => {
         },
         {
           model:jugadores,
-          atributtes:['id','nombre']
+          attributtes:['id','nombre']
         }
 
       ],
