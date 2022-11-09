@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Fixture extends Model {
     /**
@@ -12,47 +10,42 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Fixture.belongsTo(models.Torneo, {
-        foreignKey: 'torneo_id',
+        foreignKey: "torneo_id",
       });
       Fixture.belongsTo(models.Equipo, {
-        as: 'local',
-        foreignKey: 'equipo_local',
+        as: "local",
+        foreignKey: "equipo_local",
       });
       Fixture.belongsTo(models.Equipo, {
-        as: 'visitante',
-        foreignKey: 'equipo_visitante',
+        as: "visitante",
+        foreignKey: "equipo_visitante",
       });
       Fixture.belongsToMany(models.Estadistica, {
-        through: 'estadisticasbypartidos',
-        foreignKey: 'partido_id',
-        timestamps : false,
+        through: "estadisticasbypartidos",
+        foreignKey: "partido_id",
+        timestamps: false,
       });
-
-
-    
-
-    
-
     }
   }
-  Fixture.init({
-    num_fecha: DataTypes.INTEGER,
-    equipo_local: DataTypes.BIGINT,
-    equipo_visitante: DataTypes.BIGINT,
-    goles_local: DataTypes.INTEGER,
-    goles_visitante: DataTypes.INTEGER,
-    torneo_id: DataTypes.INTEGER,
-    fecha_desde: DataTypes.DATE,
-    fecha_hasta: DataTypes.DATE,
-    estado: DataTypes.STRING,
-    grupo: DataTypes.STRING,
-    ganador: DataTypes.STRING,
-
-
-  }, {
-    sequelize,
-    modelName: 'Fixture',
-    timestamps : false,
-  });
+  Fixture.init(
+    {
+      num_fecha: DataTypes.INTEGER,
+      equipo_local: DataTypes.BIGINT,
+      equipo_visitante: DataTypes.BIGINT,
+      goles_local: DataTypes.INTEGER,
+      goles_visitante: DataTypes.INTEGER,
+      torneo_id: DataTypes.INTEGER,
+      fecha_desde: DataTypes.DATE,
+      fecha_hasta: DataTypes.DATE,
+      estado: DataTypes.STRING,
+      grupo: DataTypes.STRING,
+      ganador: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "Fixture",
+      timestamps: false,
+    }
+  );
   return Fixture;
 };

@@ -4,6 +4,8 @@ const estadisticasbypartidoss = require("../models").EstadisticasByPartido;
 const estadistica = require("../models").Estadistica;
 const jugador = require("../models").Jugador;
 const equipo = require("../models").Equipo;
+const torneos = require("../models").Torneo;
+const partidos = require("../models").Fixture;
 
 const getItems = async (req, res) => {
   try {
@@ -45,51 +47,105 @@ const getItem = async (req, res) => {};
 //obtener goleadores por torneo
 const getGoleadoresByTorneo = async (req, res) => {
   try {
-    const estadisticas = await estadisticasbypartidoss.findAll({
-      where: { torneo_id: req.params.id },
-      include: [
-        {
-          model: estadistica,
-          where: { id: 1 },
-        },
-        {
-          model: jugador,
-          attributes: ["nombre"],
-          include: [
-            {
-              model:equipo,
-              attributes: ["nombre_corto"]
-            }
-          ]
-        },
-      ],
-    }).then((data) => {
-      const goleadores = data.map((goleador) => {
-        return {
-          id: goleador.jugador_id,
-          nombre: goleador?.Jugador?.nombre,
-          equipo: goleador?.Jugador?.Equipo.nombre_corto,
-          goles: goleador.cantidad,
-        };
+    const estadisticas = await estadisticasbypartidoss
+      .findAll({
+        where: { torneo_id: req.params.id },
+        include: [
+          {
+            model: estadistica,
+            where: { id: 1 },
+          },
+          {
+            model: jugador,
+            attributes: ["nombre"],
+            include: [
+              {
+                model: equipo,
+                attributes: ["nombre_corto"],
+              },
+            ],
+          },
+        ],
+      })
+      .then((data) => {
+        const goleadores = data.map((goleador) => {
+          return {
+            id: goleador.jugador_id,
+            nombre: goleador?.Jugador?.nombre,
+            equipo: goleador?.Jugador?.Equipo.nombre_corto,
+            goles: goleador.cantidad,
+          };
+        });
+
+        //sumar goles
+        const goleadoresFiltrados = goleadores.reduce((acc, goleador) => {
+          const existe = acc.find((g) => g.id === goleador.id);
+          if (existe) {
+            existe.goles += goleador.goles;
+          } else {
+            acc.push(goleador);
+          }
+          return acc;
+        }, []);
+
+        return goleadoresFiltrados;
       });
-
-      //sumar goles
-      const goleadoresFiltrados = goleadores.reduce((acc, goleador) => {
-        const existe = acc.find((g) => g.id === goleador.id);
-        if (existe) {
-          existe.goles += goleador.goles;
-        } else {
-          acc.push(goleador);
-        }
-        return acc;
-      }, []);
-
-
-      return goleadoresFiltrados;
-
-    });
     return res.json({ estadisticas, status: 200 });
-    
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
+//obtener asistencias por torneo
+const getEstadisticasByTorneo = async (req, res) => {
+  try {
+    const { torneo_id } = req.params;
+    const { estadistica_id } = req.query;
+
+    const estadisticas = await estadisticasbypartidoss
+      .findAll({
+        where: { torneo_id: torneo_id },
+        include: [
+          {
+            model: estadistica,
+            where: { id: estadistica_id },
+          },
+          {
+            model: jugador,
+            attributes: ["nombre"],
+            include: [
+              {
+                model: equipo,
+                attributes: ["nombre_corto"],
+              },
+            ],
+          },
+        ],
+      })
+      .then((data) => {
+        const asistencias = data.map((asistencia) => {
+          return {
+            id: asistencia.jugador_id,
+            nombre: asistencia?.Jugador?.nombre,
+            equipo: asistencia?.Jugador?.Equipo.nombre_corto,
+            asistencias: asistencia.cantidad,
+          };
+        });
+
+        //sumar asistencias
+        const asistenciasFiltradas = asistencias.reduce((acc, asistencia) => {
+          const existe = acc.find((a) => a.id === asistencia.id);
+          if (existe) {
+            existe.asistencias += asistencia.asistencias;
+          } else {
+            acc.push(asistencia);
+          }
+          return acc;
+        }, []);
+
+        return asistenciasFiltradas;
+      });
+    return res.json({ estadisticas, status: 200 });
   } catch (error) {
     httpError(res, error);
   }
@@ -270,7 +326,8 @@ const cargarLesionRoja = async (req, res) => {
     const { lesionados, idPartido, idTorneo, estadistica_id } = req.body;
 
     const existeStats = await estadisticasbypartidoss.findAll({
-      where: { partido_id: idPartido, estadistica_id: estadistica_id },
+      where: { partido_id: idPartido, estadistica_id: estadistica_id }
+
     });
 
     if (existeStats) {
@@ -278,9 +335,7 @@ const cargarLesionRoja = async (req, res) => {
       lesionados.forEach(async (jugador) => {
         existeStats.forEach(async (stat) => {
           if (stat.jugador_id !== jugador.id) {
-            await estadisticasbypartidoss.destroy(
-              { where: { id: stat.id } }
-            );
+            await estadisticasbypartidoss.destroy({ where: { id: stat.id } });
           }
         });
       });
@@ -393,6 +448,52 @@ const cargarAsistencias = async (req, res) => {
   }
 };
 
+const getSancionadosByEquipoByTorneo = async (req, res) => {
+  try {
+    const { equipo_id } = req.params;
+
+    const { torneo_id } = req.query;
+
+    const sanciones = await estadisticasbypartidoss.findAll({
+      where: { torneo_id: torneo_id }
+    })
+
+    console.log(sanciones,torneo_id)
+    const sancionados = await jugador
+      .findAll({
+        where: { equipo_id: equipo_id },
+        attributes: ["id", "nombre"],
+        include: [
+          {
+            model: estadistica,
+            include: [
+              {
+                model:partidos,
+                attributes: ['num_fecha'],
+              }
+            ],
+          }
+        ],
+      })
+      .then((jugadores) => {
+          
+        const jugadoresSancionesFechas = {
+          jugadores: jugadores,
+          sanciones: sanciones,
+        };
+        return jugadoresSancionesFechas;
+      });
+
+    return res.json({
+      status: 201,
+      message: "Sancionados obtenidos correctamente",
+      sancionados,
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
+
 const updateItems = (req, res) => {};
 const deleteItems = (req, res) => {};
 
@@ -409,4 +510,6 @@ module.exports = {
   cargarMvp,
   cargarGoleadores,
   cargarAsistencias,
+  getEstadisticasByTorneo,
+  getSancionadosByEquipoByTorneo,
 };
