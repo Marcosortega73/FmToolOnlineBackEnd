@@ -6,6 +6,9 @@ const jugador = require("../models").Jugador;
 const equipo = require("../models").Equipo;
 const torneos = require("../models").Torneo;
 const partidos = require("../models").Fixture;
+//import Op
+const { Op } = require("sequelize");
+
 
 const getItems = async (req, res) => {
   try {
@@ -454,11 +457,8 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
 
     const { torneo_id } = req.query;
 
-    const sanciones = await estadisticasbypartidoss.findAll({
-      where: { torneo_id: torneo_id }
-    })
+    console.log("EQUIPOOOOOOOOOOOOOOOOO",equipo_id, "ASDTORNEOOO",torneo_id);
 
-    console.log(sanciones,torneo_id)
     const sancionados = await jugador
       .findAll({
         where: { equipo_id: equipo_id },
@@ -466,6 +466,8 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
         include: [
           {
             model: estadistica,
+           //donde la estadistica este entre 3 y 6
+            
             include: [
               {
                 model:partidos,
@@ -476,13 +478,31 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
         ],
       })
       .then((jugadores) => {
-          
-        const jugadoresSancionesFechas = {
-          jugadores: jugadores,
-          sanciones: sanciones,
-        };
-        return jugadoresSancionesFechas;
+        const jugadoresSancionados = jugadores.map((jugador,index) => {
+          let sancion = [];
+          if (jugador.Estadisticas.length > 0) {
+            sancion = jugador.Estadisticas.map((estadistica) => {
+              if (estadistica.id >= 3 && estadistica.id <= 6) {
+                const cantidadIndices = estadistica?.Fixtures?.length;
+                const fecha = estadistica.Fixtures[cantidadIndices - 1].num_fecha;
+              return {
+                fecha: fecha,
+                tipo: estadistica.id,
+              }
+              }
+              return null;
+            });
+          }
+          return {
+            id: jugador.id,
+            nombre: jugador.nombre,
+            sancion: sancion
+          };
+        });
+       return jugadoresSancionados
       });
+
+/*       */
 
     return res.json({
       status: 201,
