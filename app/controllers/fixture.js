@@ -21,7 +21,7 @@ const getItems = async (req, res) => {
           include: [
             {
               model:jugadores,
-              attributes:['id','nombre']
+              attributes:['id','nombre',"equipo_id"]
             }
           ]
         },
@@ -31,7 +31,7 @@ const getItems = async (req, res) => {
           include: [
             {
               model:jugadores,
-              attributes:['id','nombre']
+              attributes:['id','nombre',"equipo_id"]
             }
           ]
         },
@@ -62,7 +62,7 @@ const getItemsFilter = async (req, res) => {
           include: [
             {
               model:jugadores,
-              attributtes:['id','nombre']
+              attributtes:['id','nombre',"equipo_id"]
             }
           ]
               
@@ -73,7 +73,7 @@ const getItemsFilter = async (req, res) => {
           include: [
             {
               model:jugadores,
-              attributtes:['id','nombre']
+              attributtes:['id','nombre',"equipo_id"]
             }
           ]
         },

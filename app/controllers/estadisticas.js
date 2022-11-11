@@ -6,9 +6,9 @@ const jugador = require("../models").Jugador;
 const equipo = require("../models").Equipo;
 const torneos = require("../models").Torneo;
 const partidos = require("../models").Fixture;
+
 //import Op
 const { Op } = require("sequelize");
-
 
 const getItems = async (req, res) => {
   try {
@@ -190,6 +190,35 @@ const cargarRojas = async (req, res) => {
         jugador_id: jugador.id,
         torneo_id: idTorneo,
       });
+
+      //suspender para el proximo partido
+      console.log("jugadorrrrr", jugador);
+      const proxPartido = await partidos
+        .findAll({
+          where: {
+            torneo_id: idTorneo,
+            //Equipopo visitante o local
+            [Op.or]: [
+              { equipo_local: jugador.equipo_id },
+              { equipo_visitante: jugador.equipo_id },
+            ],
+          },
+        })
+        .then((data) => {
+          const proxPartido = data.find((partido) => {
+            return partido.id > idPartido;
+          });
+          console.log("proximo partidooooooooo", proxPartido);
+          return proxPartido;
+        });
+
+      //suspender jugador
+      await estadisticasbypartidoss.create({
+        partido_id: proxPartido.id,
+        estadistica_id: 8,
+        jugador_id: jugador.id,
+        torneo_id: idTorneo,
+      });
     });
 
     return res.json({
@@ -236,6 +265,48 @@ const cargarAmarillas = async (req, res) => {
         jugador_id: jugador.id,
         torneo_id: idTorneo,
       });
+
+      //si tiene dos amarillas, se suspende para el proximo partido
+      const amarillas = await estadisticasbypartidoss
+        .findAll({
+          where: {
+            jugador_id: jugador.id,
+            estadistica_id: estadistica_id,
+          },
+        })
+        .then((data) => {
+          return data.length;
+        });
+
+      if (amarillas === 2) {
+        //suspender para el proximo partido
+        const proxPartido = await partidos
+          .findAll({
+            where: {
+              torneo_id: idTorneo,
+              //Equipopo visitante o local
+              [Op.or]: [
+                { equipo_local: jugador.equipo_id },
+                { equipo_visitante: jugador.equipo_id },
+              ],
+            },
+          })
+          .then((data) => {
+            const proxPartido = data.find((partido) => {
+              return partido.id > idPartido;
+            });
+            console.log("proximo partidooooooooo", proxPartido);
+            return proxPartido;
+          });
+
+        //suspender jugador
+        await estadisticasbypartidoss.create({
+          partido_id: proxPartido.id,
+          estadistica_id: 8,
+          jugador_id: jugador.id,
+          torneo_id: idTorneo,
+        });
+      }
     });
     return res.json({
       status: 200,
@@ -314,6 +385,34 @@ const cargarLesionNaranja = async (req, res) => {
         jugador_id: jugador.id,
         torneo_id: idTorneo,
       });
+      //suspender para el proximo partido
+      console.log("jugadorrrrr", jugador);
+      const proxPartido = await partidos
+        .findAll({
+          where: {
+            torneo_id: idTorneo,
+            //Equipopo visitante o local
+            [Op.or]: [
+              { equipo_local: jugador.equipo_id },
+              { equipo_visitante: jugador.equipo_id },
+            ],
+          },
+        })
+        .then((data) => {
+          const proxPartido = data.find((partido) => {
+            return partido.id > idPartido;
+          });
+          console.log("proximo partidooooooooo", proxPartido);
+          return proxPartido;
+        });
+
+      //suspender jugador
+      await estadisticasbypartidoss.create({
+        partido_id: proxPartido.id,
+        estadistica_id: 8,
+        jugador_id: jugador.id,
+        torneo_id: idTorneo,
+      });
     });
     return res.json({
       status: 200,
@@ -329,8 +428,7 @@ const cargarLesionRoja = async (req, res) => {
     const { lesionados, idPartido, idTorneo, estadistica_id } = req.body;
 
     const existeStats = await estadisticasbypartidoss.findAll({
-      where: { partido_id: idPartido, estadistica_id: estadistica_id }
-
+      where: { partido_id: idPartido, estadistica_id: estadistica_id },
     });
 
     if (existeStats) {
@@ -348,6 +446,60 @@ const cargarLesionRoja = async (req, res) => {
       await estadisticasbypartidoss.create({
         partido_id: idPartido,
         estadistica_id,
+        jugador_id: jugador.id,
+        torneo_id: idTorneo,
+      });
+      //suspender para el proximo partido
+      console.log("jugadorrrrr", jugador);
+      const proxPartido = await partidos
+        .findAll({
+          where: {
+            torneo_id: idTorneo,
+            //Equipopo visitante o local
+            [Op.or]: [
+              { equipo_local: jugador.equipo_id },
+              { equipo_visitante: jugador.equipo_id },
+            ],
+          },
+        })
+        .then((data) => {
+          const proxPartido = data.find((partido) => {
+            return partido.id > idPartido;
+          });
+          console.log("proximo partidooooooooo", proxPartido);
+          return proxPartido;
+        });
+
+      //suspender jugador
+      await estadisticasbypartidoss.create({
+        partido_id: proxPartido.id,
+        estadistica_id: 8,
+        jugador_id: jugador.id,
+        torneo_id: idTorneo,
+      });
+      const dobleSuspencion = await partidos
+        .findAll({
+          where: {
+            torneo_id: idTorneo,
+            //Equipopo visitante o local
+            [Op.or]: [
+              { equipo_local: jugador.equipo_id },
+              { equipo_visitante: jugador.equipo_id },
+            ],
+          },
+        })
+        .then((data) => {
+          const dobleSuspencion = data.find((partido) => {
+            return partido.id > idPartido;
+          });
+          console.log("proximo partidooooooooo", dobleSuspencion);
+          return dobleSuspencion;
+        });
+
+      //suspender jugador
+      await estadisticasbypartidoss.create({
+        partido_id: dobleSuspencion.id,
+        estadistica_id: 8,
         jugador_id: jugador.id,
         torneo_id: idTorneo,
       });
@@ -457,7 +609,7 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
 
     const { torneo_id } = req.query;
 
-    console.log("EQUIPOOOOOOOOOOOOOOOOO",equipo_id, "ASDTORNEOOO",torneo_id);
+    console.log("EQUIPOOOOOOOOOOOOOOOOO", equipo_id, "ASDTORNEOOO", torneo_id);
 
     const sancionados = await jugador
       .findAll({
@@ -466,43 +618,46 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
         include: [
           {
             model: estadistica,
-           //donde la estadistica este entre 3 y 6
-            
+            //donde la estadistica este entre 3 y 6
+
             include: [
               {
-                model:partidos,
-                attributes: ['num_fecha'],
-              }
+                model: partidos,
+                attributes: ["num_fecha"],
+              },
             ],
-          }
+          },
         ],
       })
       .then((jugadores) => {
-        const jugadoresSancionados = jugadores.map((jugador,index) => {
+        const jugadoresSancionados = jugadores.map((jugador, index) => {
           let sancion = [];
           if (jugador.Estadisticas.length > 0) {
-            sancion = jugador.Estadisticas.map((estadistica) => {
-              if (estadistica.id >= 3 && estadistica.id <= 6) {
+            jugador.Estadisticas.map((estadistica, index) => {
+              if (
+                (estadistica.id >= 3 && estadistica.id <= 6) ||
+                estadistica.id == 8
+              ) {
                 const cantidadIndices = estadistica?.Fixtures?.length;
-                const fecha = estadistica.Fixtures[cantidadIndices - 1].num_fecha;
-              return {
-                fecha: fecha,
-                tipo: estadistica.id,
+                const fecha =
+                  estadistica.Fixtures[cantidadIndices - 1].num_fecha;
+                sancion.push({
+                  fecha,
+                  tipo: estadistica.id,
+                });
               }
-              }
-              return null;
             });
           }
           return {
             id: jugador.id,
             nombre: jugador.nombre,
-            sancion: sancion
+            sancion: sancion.length > 0 ? sancion : [],
           };
         });
-       return jugadoresSancionados
+        return jugadoresSancionados;
       });
 
-/*       */
+    /*       */
 
     return res.json({
       status: 201,
