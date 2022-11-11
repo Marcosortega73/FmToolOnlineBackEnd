@@ -449,6 +449,7 @@ const cargarLesionRoja = async (req, res) => {
         jugador_id: jugador.id,
         torneo_id: idTorneo,
       });
+
       //suspender para el proximo partido
       console.log("jugadorrrrr", jugador);
       const proxPartido = await partidos
@@ -477,6 +478,8 @@ const cargarLesionRoja = async (req, res) => {
         jugador_id: jugador.id,
         torneo_id: idTorneo,
       });
+
+      
       const dobleSuspencion = await partidos
         .findAll({
           where: {
@@ -490,7 +493,7 @@ const cargarLesionRoja = async (req, res) => {
         })
         .then((data) => {
           const dobleSuspencion = data.find((partido) => {
-            return partido.id > idPartido;
+            return partido.id > proxPartido.id;
           });
           console.log("proximo partidooooooooo", dobleSuspencion);
           return dobleSuspencion;
@@ -615,47 +618,39 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
       .findAll({
         where: { equipo_id: equipo_id },
         attributes: ["id", "nombre"],
-        include: [
-          {
-            model: estadistica,
-            //donde la estadistica este entre 3 y 6
-
-            include: [
-              {
-                model: partidos,
-                attributes: ["num_fecha"],
-              },
-            ],
-          },
-        ],
       })
-      .then((jugadores) => {
-        const jugadoresSancionados = jugadores.map((jugador, index) => {
-          let sancion = [];
-          if (jugador.Estadisticas.length > 0) {
-            jugador.Estadisticas.map((estadistica, index) => {
-              if (
-                (estadistica.id >= 3 && estadistica.id <= 6) ||
-                estadistica.id == 8
-              ) {
-                const cantidadIndices = estadistica?.Fixtures?.length;
-                const fecha =
-                  estadistica.Fixtures[cantidadIndices - 1].num_fecha;
-                sancion.push({
-                  fecha,
-                  tipo: estadistica.id,
-                });
-              }
-            });
-          }
-          return {
-            id: jugador.id,
-            nombre: jugador.nombre,
-            sancion: sancion.length > 0 ? sancion : [],
-          };
-        });
-        return jugadoresSancionados;
+    //obtener los saciones de los jugadores
+
+    const sanciones = await estadisticasbypartidoss.findAll({
+      where: {
+        torneo_id: torneo_id,
+        //not estadistica_id: 1 2 7},
+        [Op.not]: [{ estadistica_id: [1, 2, 7] }],
+      },
+      include: [
+        {
+          model: jugador,
+          attributes: ["nombre","equipo_id"],
+          //or local o visitante
+          where: {
+            equipo_id: equipo_id,
+          },
+        },
+        {
+          model:partidos,
+          attributes: ["num_fecha"],
+        }
+      ],
+    });
+
+    //agregar las sanciones a los jugadores
+    sancionados.forEach((jugador) => {
+      jugador.dataValues.sanciones = sanciones.filter((sancion) => {
+        return sancion.jugador_id === jugador.id;
       });
+    });
+
+    
 
     /*       */
 
@@ -668,6 +663,8 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
     httpError(res, error);
   }
 };
+
+
 
 const updateItems = (req, res) => {};
 const deleteItems = (req, res) => {};
