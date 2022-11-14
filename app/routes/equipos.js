@@ -1,11 +1,14 @@
 const express = require('express');
 const verifyToken = require('../middlewares/verifyToken');
 const router = express.Router();
-const {getItems,getItem,createItems,updateItems,deleteItems,equiposxnacion} = require('../controllers/equipos')
+const {getItems,createItems,getEquiposTorneos,updateItems,deleteItems,equiposxnacion} = require('../controllers/equipos')
 
 router.get('/obtenerEquipos', getItems )
 
-router.get('/:id', getItem)
+getEquiposTorneos
+router.get('/getEquiposTorneos', getEquiposTorneos )
+
+
 
 router.post('/createEquipo',verifyToken, createItems)
 

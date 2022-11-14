@@ -4,6 +4,8 @@ const Manager = require("../models").Manager;
 const administrador = require("../models").Administrador;
 const UserState = require("../models").UserState;
 const bcrypt = require("bcrypt");
+const torneo = require("../models").Torneo;
+const equipo = require("../models").Equipo;
 
 const {
   generateToken,
@@ -54,6 +56,7 @@ const registerPending = async (req, res) => {
           switch (stateSelect.nombre) {
             case "Trabajando":
               const { equipo_id } = req.body;
+              console.log(",equipo_id", equipo_id);
               await Manager.create({
                 email,
                 password: existsUserPending.password,
@@ -333,7 +336,18 @@ const loginUsers = async (req, res) => {
     const { email, password } = req.body;
 
     const userManager = await Manager.findOne({
-      include: [{ all: true }],
+      include: [
+        { all: true },
+        {
+          model: equipo,
+          include: [
+            {
+              model: torneo,
+            },
+          ],
+        },
+      ],
+
       where: { email },
     });
 
@@ -359,8 +373,8 @@ const loginUsers = async (req, res) => {
         data: {
           email: userAdministrador.email,
           rol: userAdministrador.rol,
-          state: userAdministrador.Estado ? userAdministrador.Estado : null
-        }
+          state: userAdministrador.Estado ? userAdministrador.Estado : null,
+        },
       });
     } else if (userManager) {
       const validPasswordd = await bcrypt.compare(
@@ -409,8 +423,14 @@ const loginUsers = async (req, res) => {
 
 const getDataUser = async (req, res) => {
   try {
-    const admin = await administrador.findOne({  include: [{ all: true }],where: { id: req.uid } });
-    const manager = await Manager.findOne({  include: [{ all: true }],where: { id: req.uid } });
+    const admin = await administrador.findOne({
+      include: [{ all: true }],
+      where: { id: req.uid },
+    });
+    const manager = await Manager.findOne({
+      include: [{ all: true }],
+      where: { id: req.uid },
+    });
     console.log("HOLA GENTE");
     if (admin) {
       return res.status(200).json({

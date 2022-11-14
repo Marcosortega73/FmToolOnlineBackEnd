@@ -2,9 +2,12 @@ const express = require('express');
 const verifyToken = require('../middlewares/verifyToken');
 const uploadFile = require('../middlewares/fileManager');
 const router = express.Router();
-const {getItems,getItem,createItems,updateItems,deleteItems,getItemsFilter} = require('../controllers/jugadores')
+const {getItems,getItem,createItems,getStatsJugadoresByEquipo,updateItems,getJugadoresByEquipo,deleteItems,getItemsFilter} = require('../controllers/jugadores')
 
 router.get('/obtenerJugadores' , getItems )
+
+router.get('/jugadoresByEquipo/:id' , getJugadoresByEquipo )
+router.get('/statsJugadoresByEquipo/:id' , getStatsJugadoresByEquipo )
 
 router.get('/filtros', getItemsFilter )
 

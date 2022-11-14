@@ -12,7 +12,8 @@ const {
   getGoleadoresByTorneo,
   cargarLesionRoja,
   cargarLesionNaranja,
-  getSancionadosByEquipoByTorneo
+  getSancionadosByEquipoByTorneo,
+  getEquiposByEquipo,
 } = require("../controllers/estadisticas");
 
 router.get("/obtenerEstadisticas", getItems);
@@ -37,5 +38,8 @@ router.post("/cargarAsistencias", cargarAsistencias);
 router.get("/obtenerGoleadores/:id", getGoleadoresByTorneo);
 router.get("/obtenerEstadisticas/:torneo_id", getEstadisticasByTorneo);
 router.get("/obtenerSancionados/:equipo_id", getSancionadosByEquipoByTorneo);
+
+router.get("/obtenerEstadisticasByEquipo/:equipo_id", getEquiposByEquipo);
+
 
 module.exports = router;

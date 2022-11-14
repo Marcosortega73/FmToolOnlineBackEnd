@@ -3,6 +3,8 @@ const { httpError } = require("../helpers/handleError");
 const nacionalidad = require("../models").Nacionalidad;
 const jugador = require("../models").Jugador;
 const Equipo = require("../models").Equipo;
+const torneo = require("../models").Torneo;
+const estadistica = require("../models").Estadistica;
 
 const getItems = async (req, res) => {
   try {
@@ -10,12 +12,19 @@ const getItems = async (req, res) => {
     const players = await jugador.findAll({
       include: [
         {
-            model: Equipo ,
-            include: [nacionalidad], 
+          model: Equipo,
+          include: [
+            {
+              model: torneo,
+            },
+            {
+              model: nacionalidad,
+            },
+          ],
         },
         {
           model: nacionalidad,
-        }
+        },
       ],
     });
     return res.json({ players });
@@ -41,7 +50,7 @@ const getItemsFilter = async (req, res) => {
         },
         {
           model: nacionalidad,
-        }
+        },
       ],
       where: { nombre: { [Sequelize.Op.like]: searchString } },
       limit: limit,
@@ -145,6 +154,73 @@ const deleteItems = async (req, res) => {
   }
 };
 
+const getJugadoresByEquipo = async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log("ID EQUIPO", req.params.id);
+    const players = await jugador.findAll({
+      include: [
+        {
+          model: Equipo,
+          include: [
+            {
+              model: torneo,
+            },
+            {
+              model: nacionalidad,
+            },
+          ],
+        },
+        {
+          model: nacionalidad,
+        },
+        {
+          model: estadistica,
+        },
+      ],
+      where: {
+        equipo_id: id,
+      },
+    });
+    return res.json({ players });
+  } catch (e) {
+    httpError(res, e);
+  }
+};
+
+const getStatsJugadoresByEquipo = async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log("ID EQUIPO", req.params.id);
+    const players = await jugador.findAll({
+      include: [
+        {
+          model: Equipo,
+          attributes: ["id"],
+          include: [
+            {
+              model: torneo,
+            },
+            {
+              model: nacionalidad,
+            },
+          ],
+        },
+        {
+          model: nacionalidad,
+        },
+      ],
+      where: {
+        equipo_id: id,
+      },
+      attributes: ["nombre"],
+    });
+    return res.json({ players });
+  } catch (e) {
+    httpError(res, e);
+  }
+};
+
 module.exports = {
   getItems,
   getItem,
@@ -152,4 +228,6 @@ module.exports = {
   updateItems,
   deleteItems,
   getItemsFilter,
+  getJugadoresByEquipo,
+  getStatsJugadoresByEquipo,
 };

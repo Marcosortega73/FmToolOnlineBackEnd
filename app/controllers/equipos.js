@@ -3,11 +3,13 @@ const sequelize = require("sequelize");
 const { httpError } = require("../helpers/handleError");
 const continente = require("../models").Continente;
 const equipos = require("../models").Equipo;
+const equiposBytorneo =require('../models').equipo_x_torneo;
 const nacionalidad = require("../models").Nacionalidad;
 const manager = require("../models").Manager;
 const { Op } = require("sequelize");
 const torneo = require("../models").Torneo;
 const jugadores = require("../models").Jugador;
+
 
 const getItems = async (req, res) => {
   try {
@@ -34,8 +36,9 @@ const getItems = async (req, res) => {
         },
         {
           model:jugadores,
-          attributtes:['id','nombre']
+          attributes:['id','nombre']
         }
+
 
       ],
     }); /* .then((data) => {
@@ -64,7 +67,39 @@ const getItems = async (req, res) => {
   }
 };
 
-const getItem = async (req, res) => {};
+const getEquiposTorneos = async (req, res) => {
+
+  try {
+
+    const equiposByTorneo = await equiposBytorneo.findAll({
+      include:[
+        {
+          model:equipos,
+          attributes:['id','nombre'],
+          order: [["nombre", "ASC"]],
+          include:[
+            {
+              model:nacionalidad,
+              attributes:['id','nombre']
+            },
+            {
+              model:manager,
+              attributes:['id']
+            }
+          ]
+        }
+      ],
+
+    });
+    res.json({
+      clubes: equiposByTorneo,
+      status: 200,
+    });
+  } catch (e) {
+    httpError(res, e);
+  }
+  
+};
 
 const createItems = async (req, res) => {
   try {
@@ -212,9 +247,10 @@ const deleteItems = async (req, res) => {
 
 module.exports = {
   getItems,
-  getItem,
+
   createItems,
   updateItems,
   deleteItems,
   equiposxnacion,
+  getEquiposTorneos,
 };
