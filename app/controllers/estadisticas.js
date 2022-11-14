@@ -66,18 +66,18 @@ const getGoleadoresByTorneo = async (req, res) => {
 //createItems
 const createItems = async (req, res) => {
   try {
-    const { jugadores } = req.body;
 
-    console.log("jugadoreseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", jugadores);
-    jugadores[0].forEach(async (jugador) => {
+    console.log("jugadoreseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", req.body);
+    const {jugadores,partido,torneo} = req.body;
+
+    jugadores.forEach(async (jugador) => {
       await estadisticasbypartidoss.create({
       partido_id:jugador.partido_id,
-      estadistica_id:jugador.estadistica_id,
+      estadistica_id:3,
       jugador_id:jugador.jugador.id,
       torneo_id:jugador.torneo_id,
-      cantidad:jugador.cantidad,
     });
-  });
+  }); 
 
     return res.json({ status: 200, message: "Estadisticas creadas correctamente" });
   } catch (error) {
