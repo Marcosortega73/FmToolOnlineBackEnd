@@ -99,7 +99,7 @@ const updateItems = (req, res) => {
         id: id,
         nombre,
         nacionalidad_id: nacionalidad,
-        equipo_id: club,
+        equipo_id: club?.id,
         altura,
         peso,
         ca,
