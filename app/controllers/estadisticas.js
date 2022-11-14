@@ -570,6 +570,7 @@ const cargarLesionRoja = async (req, res) => {
         torneo_id: idTorneo,
       });
 
+      
       const dobleSuspencion = await partidos
         .findAll({
           where: {
@@ -704,10 +705,11 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
 
     console.log("EQUIPOOOOOOOOOOOOOOOOO", equipo_id, "ASDTORNEOOO", torneo_id);
 
-    const sancionados = await jugador.findAll({
-      where: { equipo_id: equipo_id },
-      attributes: ["id", "nombre"],
-    });
+    const sancionados = await jugador
+      .findAll({
+        where: { equipo_id: equipo_id },
+        attributes: ["id", "nombre"],
+      })
     //obtener los saciones de los jugadores
 
     const sanciones = await estadisticasbypartidoss.findAll({
@@ -719,16 +721,16 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
       include: [
         {
           model: jugador,
-          attributes: ["nombre", "equipo_id"],
+          attributes: ["nombre","equipo_id"],
           //or local o visitante
           where: {
             equipo_id: equipo_id,
           },
         },
         {
-          model: partidos,
+          model:partidos,
           attributes: ["num_fecha"],
-        },
+        }
       ],
     });
 
@@ -738,6 +740,8 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
         return sancion.jugador_id === jugador.id;
       });
     });
+
+    
 
     /*       */
 
