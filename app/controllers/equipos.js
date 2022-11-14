@@ -210,6 +210,23 @@ const deleteItems = async (req, res) => {
   }
 };
 
+const getEquiposTorneos = async (req, res) => {
+  try {
+
+
+    const equiposTorneos = await equipos.findAll({
+      order: [["nombre", "ASC"]],
+      attributes: ["id", "nombre_corto"],
+    });
+
+    res.json({
+      clubes: equiposTorneos,
+      status: 200,
+    });
+  } catch (e) {
+    httpError(res, e);
+  }
+};
 module.exports = {
   getItems,
   getItem,
@@ -217,4 +234,5 @@ module.exports = {
   updateItems,
   deleteItems,
   equiposxnacion,
+  getEquiposTorneos,
 };
