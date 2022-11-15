@@ -37,6 +37,10 @@ const getItems = async (req, res) => {
         {
           model:jugadores,
           attributes:['id','nombre']
+        },
+        {
+          model: manager,
+          attributes: { exclude: ["password"] },
         }
 
 
@@ -108,7 +112,7 @@ const createItems = async (req, res) => {
     await equipos.create({
       id,
       nombre,
-      nacionalidad_id: nacionalidad,
+      nacionalidad_id: nacionalidad?.id,
       torneo_id: torneo,
     });
 
@@ -136,7 +140,7 @@ const updateItems = async (req, res) => {
         {
           id,
           nombre,
-          nacionalidad_id: nacionalidad,
+          nacionalidad_id: nacionalidad?.id,
           torneo_id: torneo,
         },
         { where: { id: id } }
@@ -245,13 +249,21 @@ const deleteItems = async (req, res) => {
   }
 };
 
-const getEquiposTorneos = async (req, res) => {
+const getEquipos = async (req, res) => {
   try {
 
 
     const equiposTorneos = await equipos.findAll({
       order: [["nombre", "ASC"]],
-      attributes: ["id", "nombre_corto"],
+      attributes: ["id","nombre" ,"nombre_corto"],
+      include: [
+        {
+          model: nacionalidad,
+          attributes: ["id","nombre","nombreCorto"],
+        }
+      ],
+
+
     });
 
     res.json({
@@ -264,10 +276,10 @@ const getEquiposTorneos = async (req, res) => {
 };
 module.exports = {
   getItems,
-
   createItems,
   updateItems,
   deleteItems,
   equiposxnacion,
   getEquiposTorneos,
+  getEquipos,
 };

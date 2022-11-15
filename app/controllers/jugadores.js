@@ -67,13 +67,13 @@ const getItem = async (req, res) => {};
 
 const createItems = async (req, res) => {
   try {
-    const { id, nombre, nacionalidad, club, altura, peso, ca, cp, valor } =
+    const { id, nombre, nacionalidad, equipo, altura, peso, ca, cp, valor } =
       req.body;
     await jugador.create({
       id: id,
       nombre,
-      nacionalidad_id: nacionalidad,
-      equipo_id: club,
+      nacionalidad_id: nacionalidad?.id,
+      equipo_id: equipo?.id,
       altura,
       peso,
       ca,
@@ -91,15 +91,15 @@ const createItems = async (req, res) => {
 };
 const updateItems = (req, res) => {
   try {
-    const { id, nombre, nacionalidad, club, altura, peso, ca, cp, valor } =
+    const { id, nombre, nacionalidad, equipo, altura, peso, ca, cp, valor } =
       req.body;
 
     jugador.update(
       {
         id: id,
         nombre,
-        nacionalidad_id: nacionalidad,
-        equipo_id: club?.id,
+        nacionalidad_id: nacionalidad?.id,
+        equipo_id: equipo?.id,
         altura,
         peso,
         ca,
