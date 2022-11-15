@@ -107,11 +107,12 @@ const getEquiposTorneos = async (req, res) => {
 
 const createItems = async (req, res) => {
   try {
-    const { id, nombre, nacionalidad, manager, torneo } = req.body;
+    const { id, nombre, nacionalidad, manager, torneo,nombre_corto } = req.body;
 
     await equipos.create({
       id,
       nombre,
+      nombre_corto,
       nacionalidad_id: nacionalidad?.id,
       torneo_id: torneo,
     });
@@ -260,6 +261,14 @@ const getEquipos = async (req, res) => {
         {
           model: nacionalidad,
           attributes: ["id","nombre","nombreCorto"],
+        },
+        {
+          model: torneo,
+          attributes: ["id","nombre"],
+        },
+        {
+          model: manager,
+          attributes: { exclude: ["password"] },
         }
       ],
 

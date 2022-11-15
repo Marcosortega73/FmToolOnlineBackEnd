@@ -12,7 +12,39 @@ const { Op } = require("sequelize");
 
 const getItems = async (req, res) => {
   try {
-    const estadisticas = await estadistica.findAll();
+    const estadisticas = await estadisticasbypartidoss.findAll({
+      include: [
+        {
+          model: estadistica,
+        },
+        {
+          model: jugador,
+          attributes: ["nombre"],
+        },
+        {
+          model: torneos,
+          attributes: ["nombre"],
+        },
+        {
+          model: partidos,
+          attributes: ["num_fecha",],
+          include: [
+            {
+              model: equipo,
+              as: "local",
+              attributes: ["id","nombre_corto"],
+            },
+            {
+              model: equipo,
+              as: "visitante",
+              attributes: ["id","nombre_corto"],
+            },
+          ],
+          
+        },
+      ],
+    
+    });
     return res.json({ estadisticas, status: 200 });
   } catch (error) {
     httpError(res, error);
