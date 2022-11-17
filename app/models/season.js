@@ -11,10 +11,6 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      //EQUIPO
-      Season.belongsTo(models.Equipo, {
-        foreignKey: 'equipo_campeon_id',
-      });
 
       //equipo mvp
       Season.belongsTo(models.Equipo, {
@@ -44,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
 
       //entrenador_mvp_id
       Season.belongsTo(models.Manager, {
-        foreignKey: 'manager_campeon_id',
+        foreignKey: 'manager_mvp_id',
       });
 
 
@@ -56,8 +52,8 @@ module.exports = (sequelize, DataTypes) => {
     nombre: DataTypes.STRING,
     fecha_inicio: DataTypes.DATE,
     fecha_fin: DataTypes.DATE,
-    equipo_campeon_id: DataTypes.BIGINT,
-    manager_campeon_id: DataTypes.UUID,
+    manager_mvp_id: DataTypes.UUID,
+    estado: DataTypes.STRING,
     jugador_mvp_id: DataTypes.BIGINT,
     jugador_goleador_id: DataTypes.BIGINT,
     jugador_asistente_id: DataTypes.BIGINT,
@@ -65,6 +61,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Season',
+    timestamps: false,
   });
   return Season;
 };
