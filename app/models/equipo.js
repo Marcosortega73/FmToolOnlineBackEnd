@@ -28,10 +28,6 @@ module.exports = (sequelize, DataTypes) => {
       Equipo.hasOne(models.Manager, {
         foreignKey: 'equipo_id',
       });
-      //relacion con season 1 a 1
-      Equipo.hasOne(models.Season, {
-        foreignKey: 'equipo_campeon_id',
-      });
       //relacion con clasificacion 1 a 1
       Equipo.hasOne(models.Clasificacion, {
         foreignKey: 'equipo_id',

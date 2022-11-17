@@ -17,15 +17,12 @@ module.exports = {
       fecha_fin: {
         type: Sequelize.DATE
       },
-      equipo_campeon_id: {
-        type: Sequelize.BIGINT,
-        references: {
-          model: 'Equipos',
-          key: 'id'
-        },
+      estado: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
-      manager_campeon_id: {
+
+      manager_mvp_id: {
         type: Sequelize.UUID,
         references: {
           model: 'Managers',
@@ -66,17 +63,7 @@ module.exports = {
           key: 'id'
         },
         allowNull: true,
-
-
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
     });
   },
   async down(queryInterface, Sequelize) {

@@ -1,17 +1,23 @@
 {"development": {
   "username": "root",
-  "password": "rock14°$$!",
-  "database": "fmonlinetoolsDev",
-  "host": "127.0.0.1",
-  "dialect": "mysql"
-}, 
+  "password": "Abc1234$",
+  "database": "testfm",
+  "host": "localhost",
+  "dialect": "mysql",
+  "define": {
+    "timestamps": false
+}
+},
 
   "test": {
     "username": "root",
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "define": {
+      "timestamps": false
+  }
   },
   "production": {
     "username": "root",

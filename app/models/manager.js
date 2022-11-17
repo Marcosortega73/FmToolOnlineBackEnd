@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'state_id',
       });
       Manager.hasMany(models.Season, {
-        foreignKey: 'manager_campeon_id',
+        foreignKey: 'manager_mvp_id',
       });
     }
   }
