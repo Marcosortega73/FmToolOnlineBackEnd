@@ -5,6 +5,7 @@ const jugador = require("../models").Jugador;
 const Equipo = require("../models").Equipo;
 const torneo = require("../models").Torneo;
 const estadistica = require("../models").Estadistica;
+const season = require("../models").Season;
 
 const getItems = async (req, res) => {
   try {
@@ -221,6 +222,8 @@ const getStatsJugadoresByEquipo = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   getItems,
   getItem,
@@ -230,4 +233,5 @@ module.exports = {
   getItemsFilter,
   getJugadoresByEquipo,
   getStatsJugadoresByEquipo,
+
 };

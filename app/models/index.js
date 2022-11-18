@@ -15,7 +15,10 @@ const db = {};
   "password": "rock14°$$!",
   "database": "fmonlinetoolsDev",
   "host": "127.0.0.1",
-  "dialect": "mysql"
+  "dialect": "mysql",
+   "define": {
+    "timestamps": false
+}
 }, 
 
 //database dev remote
@@ -24,7 +27,10 @@ const db = {};
     "password": "Abc1234$",
     "database": "testfm",
     "host": "localhost",
-    "dialect": "mysql"
+    "dialect": "mysql",
+     "define": {
+    "timestamps": false
+}
   },
 */
 

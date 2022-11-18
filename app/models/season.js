@@ -55,8 +55,6 @@ module.exports = (sequelize, DataTypes) => {
     manager_mvp_id: DataTypes.UUID,
     estado: DataTypes.STRING,
     jugador_mvp_id: DataTypes.BIGINT,
-    jugador_goleador_id: DataTypes.BIGINT,
-    jugador_asistente_id: DataTypes.BIGINT,
     equipo_mvp_id: DataTypes.BIGINT,
   }, {
     sequelize,
