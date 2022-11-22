@@ -122,9 +122,6 @@ const getManagers = async (req, res) => {
         {
           model: nacionalidad
         },
-
-
-        
       ],
     });
     return res.json({

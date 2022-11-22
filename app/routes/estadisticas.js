@@ -14,6 +14,7 @@ const {
   cargarLesionNaranja,
   getSancionadosByEquipoByTorneo,
   getEquiposByEquipo,
+  deleteItem,
 } = require("../controllers/estadisticas");
 
 router.get("/obtenerEstadisticas", getItems);
@@ -41,5 +42,6 @@ router.get("/obtenerSancionados/:equipo_id", getSancionadosByEquipoByTorneo);
 
 router.get("/obtenerEstadisticasByEquipo/:equipo_id", getEquiposByEquipo);
 
+router.delete("/eliminarEstadisticas/:id", deleteItem)
 
 module.exports = router;

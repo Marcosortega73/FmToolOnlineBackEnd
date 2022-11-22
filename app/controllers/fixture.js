@@ -20,20 +20,20 @@ const getItems = async (req, res) => {
           as: "local",
           include: [
             {
-              model:jugadores,
-              attributes:['id','nombre',"equipo_id"]
-            }
-          ]
+              model: jugadores,
+              attributes: ["id", "nombre", "equipo_id"],
+            },
+          ],
         },
         {
           model: equipoReal,
           as: "visitante",
           include: [
             {
-              model:jugadores,
-              attributes:['id','nombre',"equipo_id"]
-            }
-          ]
+              model: jugadores,
+              attributes: ["id", "nombre", "equipo_id"],
+            },
+          ],
         },
         {
           model: torneo,
@@ -61,21 +61,20 @@ const getItemsFilter = async (req, res) => {
           as: "local",
           include: [
             {
-              model:jugadores,
-              attributes:['id','nombre',"equipo_id"]
-            }
-          ]
-              
+              model: jugadores,
+              attributes: ["id", "nombre", "equipo_id"],
+            },
+          ],
         },
         {
           model: equipoReal,
           as: "visitante",
           include: [
             {
-              model:jugadores,
-              attributes:['id','nombre',"equipo_id"]
-            }
-          ]
+              model: jugadores,
+              attributes: ["id", "nombre", "equipo_id"],
+            },
+          ],
         },
       ],
       where: { torneo_id: req.params.id },
@@ -97,7 +96,7 @@ const getItemsFilterView = async (req, res) => {
       include: [
         {
           model: equipoReal,
-          as: "local",   
+          as: "local",
         },
         {
           model: equipoReal,
@@ -598,10 +597,10 @@ const updateItems = async (req, res) => {
             case "empate":
               puntosLocal = 2;
               puntosVisitante = -1;
-              ganadosLocal ++;
-              empatadosVisitante --;
-              empatadosLocal --;
-              perdidosVisitante ++;
+              ganadosLocal++;
+              empatadosVisitante--;
+              empatadosLocal--;
+              perdidosVisitante++;
 
               break;
             default:
@@ -973,6 +972,224 @@ const updateItems = async (req, res) => {
   }
 };
 const deleteItems = (req, res) => {};
+const resetItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const partido = await fixture.findByPk(id);
+
+    if (!partido) {
+      return res.json({
+        status: 400,
+        message: "El partido no existe",
+      });
+    }
+
+    await fixture.update(
+      {
+        goles_local: null,
+        goles_visitante: null,
+        ganador: null,
+        estado: "Por jugar",
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+
+    // #Obtener clasificacion del torneo
+    const clasificacionXtorneo = await clasificacion.findAll({
+      where: {
+        torneo_id: partido.torneo_id,
+      },
+    });
+
+    // #Obtener equipo local
+    const equipoXclasificacionLocal = clasificacionXtorneo.find(
+      (equipo) => equipo.equipo_id == partido.equipo_local
+    );
+
+    // #Obtener equipo visitante
+    const equipoXclasificacionVisitante = clasificacionXtorneo.find(
+      (equipo) => equipo.equipo_id == partido.equipo_visitante
+    );
+
+    // #Actualizar partidos jugados para ganador el local
+    if (partido.ganador == "local") {
+      // #Actualizar clasificacion local
+      await clasificacion.update(
+        {
+          partidos_jugados: equipoXclasificacionLocal.partidos_jugados - 1,
+          partidos_ganados: equipoXclasificacionLocal.partidos_ganados - 1,
+          goles_favor:
+            equipoXclasificacionLocal.goles_favor - partido.goles_local,
+          goles_contra:
+            equipoXclasificacionLocal.goles_contra - partido.goles_visitante,
+          puntos: equipoXclasificacionLocal.puntos - 3,
+          diferencia_goles:
+            equipoXclasificacionLocal.diferencia_goles -
+            (partido.goles_local - partido.goles_visitante),
+        },
+        {
+          where: {
+            id: equipoXclasificacionLocal.id,
+            torneo_id: partido.torneo_id,
+          },
+        }
+      );
+
+      // #Actualizar clasificacion visitante
+      await clasificacion.update(
+        {
+          partidos_jugados: equipoXclasificacionVisitante.partidos_jugados - 1,
+          partidos_perdidos:
+            equipoXclasificacionVisitante.partidos_perdidos - 1,
+          goles_favor:
+            equipoXclasificacionVisitante.goles_favor - partido.goles_visitante,
+          goles_contra:
+            equipoXclasificacionVisitante.goles_contra - partido.goles_local,
+          diferencia_goles:
+            equipoXclasificacionVisitante.diferencia_goles -
+            (partido.goles_visitante - partido.goles_local),
+        },
+        {
+          where: {
+            id: equipoXclasificacionVisitante.id,
+            torneo_id: partido.torneo_id,
+          },
+        }
+      );
+    }
+
+    // #Actualizar partidos jugados para ganador el visitante
+    if (partido.ganador == "visitante") {
+      // #Actualizar clasificacion local
+      await clasificacion.update(
+        {
+          partidos_jugados: equipoXclasificacionLocal.partidos_jugados - 1,
+          partidos_perdidos: equipoXclasificacionLocal.partidos_perdidos - 1,
+          goles_favor:
+            equipoXclasificacionLocal.goles_favor - partido.goles_local,
+          goles_contra:
+            equipoXclasificacionLocal.goles_contra - partido.goles_visitante,
+          diferencia_goles:
+            equipoXclasificacionLocal.diferencia_goles -
+            (partido.goles_local - partido.goles_visitante),
+        },
+        {
+          where: {
+            id: equipoXclasificacionLocal.id,
+            torneo_id: partido.torneo_id,
+          },
+        }
+      );
+
+      // #Actualizar clasificacion visitante
+      await clasificacion.update(
+        {
+          partidos_jugados: equipoXclasificacionVisitante.partidos_jugados - 1,
+          partidos_ganados: equipoXclasificacionVisitante.partidos_ganados - 1,
+          goles_favor:
+            equipoXclasificacionVisitante.goles_favor - partido.goles_visitante,
+          goles_contra:
+            equipoXclasificacionVisitante.goles_contra - partido.goles_local,
+          puntos: equipoXclasificacionVisitante.puntos - 3,
+          diferencia_goles:
+            equipoXclasificacionVisitante.diferencia_goles -
+            (partido.goles_visitante - partido.goles_local),
+        },
+        {
+          where: {
+            id: equipoXclasificacionVisitante.id,
+            torneo_id: partido.torneo_id,
+          },
+        }
+      );
+    }
+
+    // #Actualizar partidos jugados para empate
+    if (partido.ganador == "empate") {
+      // #Actualizar clasificacion local
+      await clasificacion.update(
+        {
+          partidos_jugados: equipoXclasificacionLocal.partidos_jugados - 1,
+          partidos_empatados: equipoXclasificacionLocal.partidos_empatados - 1,
+          goles_favor:
+            equipoXclasificacionLocal.goles_favor - partido.goles_local,
+          goles_contra:
+            equipoXclasificacionLocal.goles_contra - partido.goles_visitante,
+          puntos: equipoXclasificacionLocal.puntos - 1,
+          diferencia_goles:
+            equipoXclasificacionLocal.diferencia_goles -
+            (partido.goles_local - partido.goles_visitante),
+        },
+        {
+          where: {
+            id: equipoXclasificacionLocal.id,
+            torneo_id: partido.torneo_id,
+          },
+        }
+      );
+
+      // #Actualizar clasificacion visitante
+      await clasificacion.update(
+        {
+          partidos_jugados: equipoXclasificacionVisitante.partidos_jugados - 1,
+          partidos_empatados:
+            equipoXclasificacionVisitante.partidos_empatados - 1,
+          goles_favor:
+            equipoXclasificacionVisitante.goles_favor - partido.goles_visitante,
+          goles_contra:
+            equipoXclasificacionVisitante.goles_contra - partido.goles_local,
+          puntos: equipoXclasificacionVisitante.puntos - 1,
+          diferencia_goles:
+            equipoXclasificacionVisitante.diferencia_goles -
+            (partido.goles_visitante - partido.goles_local),
+        },
+        {
+          where: {
+            id: equipoXclasificacionVisitante.id,
+            torneo_id: partido.torneo_id,
+          },
+        }
+      );
+    }
+
+    //actualizar posicion de la tabla
+    const clasificacionXtorneos = await clasificacion.findAll({
+      where: {
+        torneo_id: partido.torneo_id,
+      },
+      order: [
+        ["puntos", "DESC"],
+        ["diferencia_goles", "DESC"],
+        ["goles_favor", "DESC"],
+      ],
+    });
+
+    for (let i = 0; i < clasificacionXtorneos.length; i++) {
+      await clasificacion.update(
+        {
+          posicion: i + 1,
+        },
+        {
+          where: {
+            id: clasificacionXtorneos[i].id,
+          },
+        }
+      );
+    }
+
+    return res.json({
+      status: 200,
+      message: "Partido reseteado correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
 
 module.exports = {
   getItems,
@@ -983,4 +1200,5 @@ module.exports = {
   confirmCretateFixture,
   getItemsFilter,
   getItemsFilterView,
+  resetItem,
 };

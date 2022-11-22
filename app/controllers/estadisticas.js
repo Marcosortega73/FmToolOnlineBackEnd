@@ -20,6 +20,12 @@ const getItems = async (req, res) => {
         {
           model: jugador,
           attributes: ["nombre"],
+          include: [
+            {
+              model: equipo,
+              attributes: ["nombre_corto"],
+            },
+          ],
         },
         {
           model: torneos,
@@ -27,23 +33,21 @@ const getItems = async (req, res) => {
         },
         {
           model: partidos,
-          attributes: ["num_fecha",],
+          attributes: ["num_fecha"],
           include: [
             {
               model: equipo,
               as: "local",
-              attributes: ["id","nombre_corto"],
+              attributes: ["id", "nombre_corto"],
             },
             {
               model: equipo,
               as: "visitante",
-              attributes: ["id","nombre_corto"],
+              attributes: ["id", "nombre_corto"],
             },
           ],
-          
         },
       ],
-    
     });
     return res.json({ estadisticas, status: 200 });
   } catch (error) {
@@ -602,7 +606,6 @@ const cargarLesionRoja = async (req, res) => {
         torneo_id: idTorneo,
       });
 
-      
       const dobleSuspencion = await partidos
         .findAll({
           where: {
@@ -737,11 +740,10 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
 
     console.log("EQUIPOOOOOOOOOOOOOOOOO", equipo_id, "ASDTORNEOOO", torneo_id);
 
-    const sancionados = await jugador
-      .findAll({
-        where: { equipo_id: equipo_id },
-        attributes: ["id", "nombre"],
-      })
+    const sancionados = await jugador.findAll({
+      where: { equipo_id: equipo_id },
+      attributes: ["id", "nombre"],
+    });
     //obtener los saciones de los jugadores
 
     const sanciones = await estadisticasbypartidoss.findAll({
@@ -753,16 +755,16 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
       include: [
         {
           model: jugador,
-          attributes: ["nombre","equipo_id"],
+          attributes: ["nombre", "equipo_id"],
           //or local o visitante
           where: {
             equipo_id: equipo_id,
           },
         },
         {
-          model:partidos,
+          model: partidos,
           attributes: ["num_fecha"],
-        }
+        },
       ],
     });
 
@@ -772,8 +774,6 @@ const getSancionadosByEquipoByTorneo = async (req, res) => {
         return sancion.jugador_id === jugador.id;
       });
     });
-
-    
 
     /*       */
 
@@ -799,7 +799,10 @@ const getEquiposByEquipo = async (req, res) => {
           model: partidos,
           attributes: ["equipo_local", "equipo_visitante"],
           where: {
-            [Op.or]: [{ equipo_local: equipo_id }, { equipo_visitante : equipo_id }],
+            [Op.or]: [
+              { equipo_local: equipo_id },
+              { equipo_visitante: equipo_id },
+            ],
           },
         },
         {
@@ -809,9 +812,7 @@ const getEquiposByEquipo = async (req, res) => {
         {
           model: jugador,
           attributes: ["nombre"],
-        }
-
-
+        },
       ],
     });
 
@@ -826,13 +827,31 @@ const getEquiposByEquipo = async (req, res) => {
 };
 
 const updateItems = (req, res) => {};
-const deleteItems = (req, res) => {};
+const deleteItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await estadisticasbypartidoss.findByPk(id);
+    if (!item) {
+      return res.json({
+        status: 404,
+        message: "No se encontro el item",
+      });
+    }
+    await item.destroy();
+    return res.json({
+      status: 200,
+      message: "Item eliminado correctamente",
+    });
+  } catch (error) {
+    httpError(res, error);
+  }
+};
 
 module.exports = {
   getItems,
   getItem,
   updateItems,
-  deleteItems,
+  deleteItem,
   cargarRojas,
   getGoleadoresByTorneo,
   cargarAmarillas,
@@ -844,5 +863,4 @@ module.exports = {
   getEstadisticasByTorneo,
   getSancionadosByEquipoByTorneo,
   getEquiposByEquipo,
-  
 };
