@@ -16,10 +16,12 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     state_id: DataTypes.INTEGER,
+    observacion: DataTypes.STRING,
     rol: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'UserPending',
+    timestamps: true,
   });
   return UserPending;
 };

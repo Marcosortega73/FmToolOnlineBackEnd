@@ -1191,14 +1191,24 @@ const resetItem = async (req, res) => {
   }
 };
 
+const createItemsExcel = async (req, res) => {
+  let response = {
+    status: 200,
+    message: "Items created successfully",
+  };
+  return res.json(response);
+}
+
 module.exports = {
   getItems,
   getItem,
   createItems,
+  createItemsExcel,
   updateItems,
   deleteItems,
   confirmCretateFixture,
   getItemsFilter,
   getItemsFilterView,
   resetItem,
+  
 };

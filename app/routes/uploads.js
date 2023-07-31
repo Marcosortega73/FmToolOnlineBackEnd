@@ -21,7 +21,7 @@ module.exports = router
 const express = require('express');
 const verifyToken = require('../middlewares/verifyToken');
 const router = express.Router();
-const { createJugadoresBase, createEquiposBase} = require('../controllers/uploadsArchivos')
+const { createJugadoresBase, createEquiposBase,createFixture} = require('../controllers/uploadsArchivos')
 const fs = require('fs')
 const pathRouter = `${__dirname}`
 const path = require('path')
@@ -42,12 +42,13 @@ const storage = multer.diskStorage({
     }
 }
 )
-
+console.log(storage)
 const upload = multer({storage }) // nombre del input
 
 
 router.post('/jugadores', upload.single('file') , createJugadoresBase)
 router.post('/equipos', upload.single('equipo') , createEquiposBase)
+router.post('/fixture', upload.single('fixture') , createFixture)
 
 
 module.exports = router

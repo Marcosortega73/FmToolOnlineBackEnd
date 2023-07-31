@@ -31,6 +31,10 @@ module.exports = {
         allowNull: false,
         defaultValue: 'USER',
       },
+      observacion: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: true,
         type: Sequelize.DATE

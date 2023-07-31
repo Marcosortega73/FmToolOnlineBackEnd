@@ -4,28 +4,8 @@ const administrador = require("../models").Administrador;
 const Manager = require("../models").Manager;
 const bcrypt = require("bcrypt");
 
-const {generateToken,generateRefreshToken} = require("../utils/tokenManager.js");
+const {generateToken} = require("../utils/tokenManager.js");
 
-
-
-// Refresh Token
-/* const refreshToken = async (req, res) => {
-  try {
-
-    const { token, expiresIn } = generateToken(req.uid);
-
-    res.json({
-      token,
-      expiresIn
-    });
-  } 
-  
-  catch (e) {
-   
-    httpError(res, e);
-  }
-  
-}; */
 //Login
 const getItem = async (req, res) => {
   console.log("LLEGANDO")
@@ -108,7 +88,6 @@ const createItems = async (req, res) => {
       });
 
       if (!existsadministrador) {
-
         await administrador
           .create(administradorReq)
           .then((admin) => {
@@ -136,19 +115,15 @@ const getUserAdmin = async(req, res) => {
   console.log("req.uid",req.uid)
   try {
     console.log
-
     const admin = await administrador.findOne({where: {id:req.uid}})
-
     if(!admin){
       throw new Error('No Existe El Usuario')
-
     }
     else{
       const {email} = admin
       res.json({email})
     }
   } 
-  
   catch (e) {
    
     httpError(res, e);
@@ -162,12 +137,5 @@ const deleteItems = (req, res) => {};
 
 
 
-// SIN UTILIZAR
-const logout = (req, res) => {
-  res.clearCookie("refreshToken");
-  res.json({
-    message: "Logout exitoso",
-  });
-};
 
-module.exports = { refreshToken,logout, getItem,getItems, createItems, updateItems, deleteItems,getUserAdmin };
+module.exports = { refreshToken,logout, getItem, createItems, updateItems, deleteItems,getUserAdmin };

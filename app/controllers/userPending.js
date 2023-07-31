@@ -49,9 +49,6 @@ const registerPending = async (req, res) => {
 
       if (rol === "MANAGER") {
         if (!userManager) {
-          console.log(
-            "=>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>=================================="
-          );
 
           switch (stateSelect.nombre) {
             case "Trabajando":
@@ -220,13 +217,14 @@ const registerPending = async (req, res) => {
 const getItems = async (req, res) => {
   try {
     const userPending = await UserPending.findAll({
-      attributes: ["id", "email", "state_id", "rol", "createdAt"],
+      attributes: ["id", "email", "state_id", "rol","observacion","createdAt"],
       include: [
         {
           model: UserState,
           attributes: ["id", "nombre", "color"],
         },
       ],
+      order: [["createdAt", "DESC"]],
     });
     return res.json({
       data: userPending,
